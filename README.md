@@ -8,12 +8,12 @@
 
 * Universidad Nacional de La Plata
 
-### Steps to run this performance test:
+### Steps to run the performance test:
 1. Clone the repository
 ```
 git clone https://github.com/ncasaburi/Databases_Performance_Test.git
 ```
-2. Move into the repo
+2. Move into the rerepositorypo
 ```
 cd Databases_Performance_Test/
 ```
