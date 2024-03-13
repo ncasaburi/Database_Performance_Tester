@@ -1,3 +1,4 @@
 # Entornos virtuales
 .venv
+__pycache__/
 /Queries/__pycache__/
