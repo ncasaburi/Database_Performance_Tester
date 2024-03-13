@@ -7,7 +7,6 @@ services:
     ports:
       - "32768:5432"
     environment:
-      POSTGRES_DB: hospital
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: secret
 
@@ -17,6 +16,5 @@ services:
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_DATABASE: hospital
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: secret

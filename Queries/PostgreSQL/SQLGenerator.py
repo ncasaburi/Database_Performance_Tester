@@ -2,6 +2,8 @@
 from randomdata import diagnosis, treatment, test_result
 from faker import Faker
 import random
+import zipfile
+import io
 
 faker = Faker()
 faker.seed_instance(42)  # Set data consistency
@@ -43,7 +45,7 @@ def generate_doctor():
         'profession': random.choice(['Cardiology', 'Pediatrics', 'Gynecology', 'Ophthalmology', 'Dermatology']),
     }
 
-number_of_rows = 10000
+number_of_rows = 100000
 
 # Generate patients
 print("Generating patients...")
@@ -66,24 +68,33 @@ for i in perm:
     patient_doctor.append((patients[i], doctors[i]))
 
 # Creation of SQL files in order to populate tables
+
 print("Creating SQL file for patients...")
-with open('Queries/PostgreSQL/Inserts/InsertPatients'+str(number_of_rows)+'.sql', 'w') as file:
+with zipfile.ZipFile('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+'_Patients.zip', 'w') as zipf:
+    patients_in_memory = ""
     for patient in patients:
-        file.write(f"INSERT INTO patients (id_patient, name, surname, birthday, gender, address, city, state, phone) VALUES ('{patient['id_patient']}','{patient['name']}', '{patient['surname']}', '{patient['birthday']}', '{patient['gender']}', '{patient['address']}', '{patient['city']}', '{patient['state']}', '{patient['phone']}');\n")
+        patients_in_memory = patients_in_memory + (f"INSERT INTO patients (id_patient, name, surname, birthday, gender, address, city, state, phone) VALUES ('{patient['id_patient']}','{patient['name']}', '{patient['surname']}', '{patient['birthday']}', '{patient['gender']}', '{patient['address']}', '{patient['city']}', '{patient['state']}', '{patient['phone']}');\n")
+    zipf.writestr(str(number_of_rows)+'_Patients.sql', io.BytesIO(patients_in_memory.encode()).getvalue())
 
 print("Creating SQL file for doctors...")
-with open('Queries/PostgreSQL/Inserts/InsertDoctors'+str(number_of_rows)+'.sql', 'w') as file:
+with zipfile.ZipFile('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+'_Doctors.zip', 'w') as zipf:
+    doctors_in_memory = ""
     for doctor in doctors:
-        file.write(f"INSERT INTO doctors (id_doctor, name, surname, profession) VALUES ('{doctor['id_doctor']}','{doctor['name']}', '{doctor['surname']}', '{doctor['profession']}');\n")
+        doctors_in_memory = doctors_in_memory + (f"INSERT INTO doctors (id_doctor, name, surname, profession) VALUES ('{doctor['id_doctor']}','{doctor['name']}', '{doctor['surname']}', '{doctor['profession']}');\n")
+    zipf.writestr(str(number_of_rows)+'_Doctors.sql', io.BytesIO(doctors_in_memory.encode()).getvalue())
 
 print("Creating SQL file for the relationships among patients, doctors and medical records...")
-with open('Queries/PostgreSQL/Inserts/InsertPatientDoctorMedicalRecord'+str(number_of_rows)+'.sql', 'w') as file:
+with zipfile.ZipFile('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+'_PatientDoctorMedicalRecord.zip', 'w') as zipf:
+    patient_doctor_medical_records_in_memory = ""
     for record in medical_records:
-        file.write(f"INSERT INTO patient_doctor_medical_record (id_patient, id_doctor, id_medical_record) VALUES ('{patient_doctor[0][0]['id_patient']}','{patient_doctor[0][1]['id_doctor']}','{record['id_medical_record']}');\n")
+        patient_doctor_medical_records_in_memory = patient_doctor_medical_records_in_memory + (f"INSERT INTO patient_doctor_medical_record (id_patient, id_doctor, id_medical_record) VALUES ('{patient_doctor[0][0]['id_patient']}','{patient_doctor[0][1]['id_doctor']}','{record['id_medical_record']}');\n")
         record['id_patient'] = patient_doctor[0][0]['id_patient']
         del patient_doctor[0]
+    zipf.writestr(str(number_of_rows)+'_PatientDoctorMedicalRecord.sql', io.BytesIO(patient_doctor_medical_records_in_memory.encode()).getvalue())
 
 print("Creating SQL file for medical records...")
-with open('Queries/PostgreSQL/Inserts/InsertMedicalRecords'+str(number_of_rows)+'.sql', 'w') as file:
+with zipfile.ZipFile('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+'_MedicalRecords.zip', 'w') as zipf:
+    medical_records_in_memory = ""
     for record in medical_records:
-        file.write(f"INSERT INTO medical_records (id_medical_record, id_patient, admission_date, discharge_date, diagnosis, treatment, test_results) VALUES ({record['id_medical_record']}, {record['id_patient']},'{record['admission_date']}', '{record['discharge_date']}', '{record['diagnosis']}', '{record['treatment']}', '{record['test_result']}');\n")
+        medical_records_in_memory = medical_records_in_memory + (f"INSERT INTO medical_records (id_medical_record, id_patient, admission_date, discharge_date, diagnosis, treatment, test_results) VALUES ({record['id_medical_record']}, {record['id_patient']},'{record['admission_date']}', '{record['discharge_date']}', '{record['diagnosis']}', '{record['treatment']}', '{record['test_result']}');\n")
+    zipf.writestr(str(number_of_rows)+'_MedicalRecords.sql', io.BytesIO(medical_records_in_memory.encode()).getvalue())

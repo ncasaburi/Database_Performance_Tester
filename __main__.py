@@ -1,74 +1,49 @@
-from Queries.PostgreSQL.postgresql import postgres_connection
+from Queries.PostgreSQL.postgresql import PostgreSQL
 from Queries.Mongo.mongo import mongo_connection
-import time
+from logger import CustomLogger
+import datetime
+import os
+
 ####################### DB CONNECTIONS ###########################
 
 mongodb_connection_string = "mongodb://admin:secret@localhost:27017/"
 postgre_connection_string = "postgresql://admin:secret@localhost:32768/"
 
 database_name = "hospital"
+logs_directory = "Logs"
 
 ##################################################################
 
 def main():
     """Start the application"""
+
+    # Check if the log directory exists
+    if not os.path.exists(logs_directory):
+        os.makedirs(logs_directory)
+
+    # Initializing logger
+    custom_logger = CustomLogger('LOG', log_dir=logs_directory+os.path.sep+str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))+'.log')
     
     #mongo = mongo_connection(mongodb_connection_string, database_name)
-    postgres = postgres_connection(postgre_connection_string)
+    
+    number_of_rows = 10000
+    custom_logger.info("Number of rows: "+str(number_of_rows))
+    postgres = PostgreSQL(postgre_connection_string, custom_logger, database_name)
+    postgres.run_query_from_file('Queries/PostgreSQL/Creates/Tables',custom_logger,'Creating tables...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+'_Doctors',custom_logger,'Populating doctors table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+'_Patients',custom_logger,'Populating patients table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+'_MedicalRecords',custom_logger,'Populating medical records table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+'_PatientDoctorMedicalRecord',custom_logger,'Populating relationships table...')
+    postgres.close(custom_logger)
 
-    print("Removing database if already exists...")
-    with open('Queries/PostgreSQL/Drops/DatabaseDrop.sql', 'r') as file:
-        query = file.read()
-        postgres.execute(query+" "+database_name)
-
-    print("\nCreating database...")
-    with open('Queries/PostgreSQL/Creates/DatabaseCreation.sql', 'r') as file:
-        query = file.read()
-        start_counter = time.time()
-        postgres.execute(query+" "+database_name)
-        stop_counter = time.time()
-        print("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
-
-    postgres = postgres_connection(postgre_connection_string, database_name)
-
-    print("\nCreating tables...")
-    with open('Queries/PostgreSQL/Creates/TablesCreation.sql', 'r') as file:
-        sql_query = file.read()
-        start_counter = time.time()
-        postgres.execute(sql_query)
-        stop_counter = time.time()
-        print("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
-
-    print("\nPopulating doctors table...")
-    with open('Queries/PostgreSQL/Inserts/InsertDoctors10000.sql', 'r') as file:
-        sql_query = file.read()
-        start_counter = time.time()
-        postgres.execute(sql_query)
-        stop_counter = time.time()
-        print("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
-
-    print("\nPopulating patients table...")
-    with open('Queries/PostgreSQL/Inserts/InsertPatients10000.sql', 'r') as file:
-        sql_query = file.read()
-        start_counter = time.time()
-        postgres.execute(sql_query)
-        stop_counter = time.time()
-        print("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
-        
-    print("\nPopulating medical records table...")
-    with open('Queries/PostgreSQL/Inserts/InsertMedicalRecords10000.sql', 'r') as file:
-        sql_query = file.read()
-        start_counter = time.time()
-        postgres.execute(sql_query)
-        stop_counter = time.time()
-        print("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
-
-    print("\nPopulating relationships table...")
-    with open('Queries/PostgreSQL/Inserts/InsertPatientDoctorMedicalRecord10000.sql', 'r') as file:
-        sql_query = file.read()
-        start_counter = time.time()
-        postgres.execute(sql_query)
-        stop_counter = time.time()
-        print("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
-
+    number_of_rows = 100000
+    custom_logger.info("Number of rows: "+str(number_of_rows))
+    postgres = PostgreSQL(postgre_connection_string, custom_logger, database_name)
+    postgres.run_query_from_file('Queries/PostgreSQL/Creates/Tables',custom_logger,'Creating tables...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+'_Doctors',custom_logger,'Populating doctors table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+'_Patients',custom_logger,'Populating patients table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+'_MedicalRecords',custom_logger,'Populating medical records table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+'_PatientDoctorMedicalRecord',custom_logger,'Populating relationships table...')
+    postgres.close(custom_logger)
+    
 main()
