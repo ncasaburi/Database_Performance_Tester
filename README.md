@@ -13,7 +13,7 @@
 ```
 git clone https://github.com/ncasaburi/Databases_Performance_Test.git
 ```
-2. Move into the rerepositorypo
+2. Move into the repository
 ```
 cd Databases_Performance_Test/
 ```
