@@ -69,22 +69,22 @@ for i in perm:
 
 # Creation of SQL files in order to populate tables
 
-print("Creating SQL file for patients...")
-with zipfile.ZipFile('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+'_Patients.zip', 'w') as zipf:
+print("Creating Zip file for patients...")
+with zipfile.ZipFile('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+'_Patients.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
     patients_in_memory = ""
     for patient in patients:
         patients_in_memory = patients_in_memory + (f"INSERT INTO patients (id_patient, name, surname, birthday, gender, address, city, state, phone) VALUES ('{patient['id_patient']}','{patient['name']}', '{patient['surname']}', '{patient['birthday']}', '{patient['gender']}', '{patient['address']}', '{patient['city']}', '{patient['state']}', '{patient['phone']}');\n")
     zipf.writestr(str(number_of_rows)+'_Patients.sql', io.BytesIO(patients_in_memory.encode()).getvalue())
 
-print("Creating SQL file for doctors...")
-with zipfile.ZipFile('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+'_Doctors.zip', 'w') as zipf:
+print("Creating Zip file for doctors...")
+with zipfile.ZipFile('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+'_Doctors.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
     doctors_in_memory = ""
     for doctor in doctors:
         doctors_in_memory = doctors_in_memory + (f"INSERT INTO doctors (id_doctor, name, surname, profession) VALUES ('{doctor['id_doctor']}','{doctor['name']}', '{doctor['surname']}', '{doctor['profession']}');\n")
     zipf.writestr(str(number_of_rows)+'_Doctors.sql', io.BytesIO(doctors_in_memory.encode()).getvalue())
 
-print("Creating SQL file for the relationships among patients, doctors and medical records...")
-with zipfile.ZipFile('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+'_PatientDoctorMedicalRecord.zip', 'w') as zipf:
+print("Creating Zip file for the relationships among patients, doctors and medical records...")
+with zipfile.ZipFile('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+'_PatientDoctorMedicalRecord.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
     patient_doctor_medical_records_in_memory = ""
     for record in medical_records:
         patient_doctor_medical_records_in_memory = patient_doctor_medical_records_in_memory + (f"INSERT INTO patient_doctor_medical_record (id_patient, id_doctor, id_medical_record) VALUES ('{patient_doctor[0][0]['id_patient']}','{patient_doctor[0][1]['id_doctor']}','{record['id_medical_record']}');\n")
@@ -92,9 +92,9 @@ with zipfile.ZipFile('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+'_Patient
         del patient_doctor[0]
     zipf.writestr(str(number_of_rows)+'_PatientDoctorMedicalRecord.sql', io.BytesIO(patient_doctor_medical_records_in_memory.encode()).getvalue())
 
-print("Creating SQL file for medical records...")
-with zipfile.ZipFile('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+'_MedicalRecords.zip', 'w') as zipf:
+print("Creating Zip file for medical records...")
+with zipfile.ZipFile('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+'_MedicalRecords.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
     medical_records_in_memory = ""
     for record in medical_records:
         medical_records_in_memory = medical_records_in_memory + (f"INSERT INTO medical_records (id_medical_record, id_patient, admission_date, discharge_date, diagnosis, treatment, test_results) VALUES ({record['id_medical_record']}, {record['id_patient']},'{record['admission_date']}', '{record['discharge_date']}', '{record['diagnosis']}', '{record['treatment']}', '{record['test_result']}');\n")
-    zipf.writestr(str(number_of_rows)+'_MedicalRecords.sql', io.BytesIO(medical_records_in_memory.encode()).getvalue())
+    zipf.writestr(str(number_of_rows)+'_MedicalRecords.sql', io.BytesIO(medical_records_in_memory.encode()).getvalue(), compresslevel=9)
