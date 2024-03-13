@@ -1,5 +1,5 @@
 
-from randomdata import diagnosis, treatment, test_result
+from Queries.PostgreSQL.randomdata import diagnosis, treatment, test_result
 from faker import Faker
 import random
 

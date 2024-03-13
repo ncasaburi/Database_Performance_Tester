@@ -1,5 +1,5 @@
-from postgresql import postgres_connection
-from mongo import mongo_connection
+from Queries.PostgreSQL.postgresql import postgres_connection
+from Queries.Mongo.mongo import mongo_connection
 import time
 ####################### DB CONNECTIONS ###########################
 
