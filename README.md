@@ -9,7 +9,7 @@
 * Universidad Nacional de La Plata
 
 ### Steps to run this performance test:
-1. Cloning this repo
+1. Clone the repository
 ```
 git clone https://github.com/ncasaburi/Databases_Performance_Test.git
 ```
