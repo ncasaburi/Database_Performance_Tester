@@ -36,6 +36,11 @@ def main():
     postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_PatientDoctorMedicalRecord',custom_logger,'Populating relationships table...')
     postgres.run_query_from_file('Queries/PostgreSQL/Updates/Patients',custom_logger,'Updating patients table...')
     postgres.run_query_from_file('Queries/PostgreSQL/Updates/Doctors',custom_logger,'Updating doctors table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Updates/Medical_Records',custom_logger,'Updating medical records table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Patient_Doctor_Medical_Record',custom_logger,'Deleting relationships table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Medical_Record',custom_logger,'Deleting medical record table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Doctors',custom_logger,'Deleting doctors table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Patients',custom_logger,'Deleting patients table...')
     postgres.close(custom_logger)
 
     number_of_rows = 5000
@@ -48,6 +53,11 @@ def main():
     postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_PatientDoctorMedicalRecord',custom_logger,'Populating relationships table...')
     postgres.run_query_from_file('Queries/PostgreSQL/Updates/Patients',custom_logger,'Updating patients table...')
     postgres.run_query_from_file('Queries/PostgreSQL/Updates/Doctors',custom_logger,'Updating doctors table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Updates/Medical_Records',custom_logger,'Updating medical records table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Patient_Doctor_Medical_Record',custom_logger,'Deleting relationships table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Medical_Record',custom_logger,'Deleting medical record table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Doctors',custom_logger,'Deleting doctors table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Patients',custom_logger,'Deleting patients table...')
     postgres.close(custom_logger)
 
     number_of_rows = 10000
@@ -60,6 +70,11 @@ def main():
     postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_PatientDoctorMedicalRecord',custom_logger,'Populating relationships table...')
     postgres.run_query_from_file('Queries/PostgreSQL/Updates/Patients',custom_logger,'Updating patients table...')
     postgres.run_query_from_file('Queries/PostgreSQL/Updates/Doctors',custom_logger,'Updating doctors table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Updates/Medical_Records',custom_logger,'Updating medical records table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Patient_Doctor_Medical_Record',custom_logger,'Deleting relationships table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Medical_Record',custom_logger,'Deleting medical record table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Doctors',custom_logger,'Deleting doctors table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Patients',custom_logger,'Deleting patients table...')
     postgres.close(custom_logger)
 
     number_of_rows = 50000
@@ -72,6 +87,11 @@ def main():
     postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_PatientDoctorMedicalRecord',custom_logger,'Populating relationships table...')
     postgres.run_query_from_file('Queries/PostgreSQL/Updates/Patients',custom_logger,'Updating patients table...')
     postgres.run_query_from_file('Queries/PostgreSQL/Updates/Doctors',custom_logger,'Updating doctors table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Updates/Medical_Records',custom_logger,'Updating medical records table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Patient_Doctor_Medical_Record',custom_logger,'Deleting relationships table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Medical_Record',custom_logger,'Deleting medical record table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Doctors',custom_logger,'Deleting doctors table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Patients',custom_logger,'Deleting patients table...')
     postgres.close(custom_logger)
 
     number_of_rows = 100000
@@ -84,6 +104,11 @@ def main():
     postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_PatientDoctorMedicalRecord',custom_logger,'Populating relationships table...')
     postgres.run_query_from_file('Queries/PostgreSQL/Updates/Patients',custom_logger,'Updating patients table...')
     postgres.run_query_from_file('Queries/PostgreSQL/Updates/Doctors',custom_logger,'Updating doctors table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Updates/Medical_Records',custom_logger,'Updating medical records table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Patient_Doctor_Medical_Record',custom_logger,'Deleting relationships table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Medical_Record',custom_logger,'Deleting medical record table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Doctors',custom_logger,'Deleting doctors table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Patients',custom_logger,'Deleting patients table...')
     postgres.close(custom_logger)
     
 main()
