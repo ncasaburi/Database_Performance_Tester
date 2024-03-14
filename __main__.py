@@ -34,6 +34,7 @@ def main():
     postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_Patients',custom_logger,'Populating patients table...')
     postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_MedicalRecords',custom_logger,'Populating medical records table...')
     postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_PatientDoctorMedicalRecord',custom_logger,'Populating relationships table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Updates/Patients',custom_logger,'Updating patients table...')
     postgres.close(custom_logger)
 
     number_of_rows = 5000
@@ -44,6 +45,7 @@ def main():
     postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_Patients',custom_logger,'Populating patients table...')
     postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_MedicalRecords',custom_logger,'Populating medical records table...')
     postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_PatientDoctorMedicalRecord',custom_logger,'Populating relationships table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Updates/Patients',custom_logger,'Updating patients table...')
     postgres.close(custom_logger)
 
     number_of_rows = 10000
@@ -54,6 +56,7 @@ def main():
     postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_Patients',custom_logger,'Populating patients table...')
     postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_MedicalRecords',custom_logger,'Populating medical records table...')
     postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_PatientDoctorMedicalRecord',custom_logger,'Populating relationships table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Updates/Patients',custom_logger,'Updating patients table...')
     postgres.close(custom_logger)
 
     number_of_rows = 50000
@@ -64,6 +67,7 @@ def main():
     postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_Patients',custom_logger,'Populating patients table...')
     postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_MedicalRecords',custom_logger,'Populating medical records table...')
     postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_PatientDoctorMedicalRecord',custom_logger,'Populating relationships table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Updates/Patients',custom_logger,'Updating patients table...')
     postgres.close(custom_logger)
 
     number_of_rows = 100000
@@ -74,6 +78,7 @@ def main():
     postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_Patients',custom_logger,'Populating patients table...')
     postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_MedicalRecords',custom_logger,'Populating medical records table...')
     postgres.run_query_from_file('Queries/PostgreSQL/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_PatientDoctorMedicalRecord',custom_logger,'Populating relationships table...')
+    postgres.run_query_from_file('Queries/PostgreSQL/Updates/Patients',custom_logger,'Updating patients table...')
     postgres.close(custom_logger)
     
 main()
