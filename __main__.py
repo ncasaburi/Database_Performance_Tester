@@ -25,7 +25,7 @@ def main():
     custom_logger = CustomLogger('LOG', log_dir=logs_directory+os.path.sep+str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))+'.log')
 
     #mongo = mongo_connection(mongodb_connection_string, database_name)
-    
+     
     number_of_rows = 1000
     custom_logger.info("Number of rows: "+str(number_of_rows))
     postgres = PostgreSQL(postgre_connection_string, custom_logger, database_name)
@@ -93,7 +93,7 @@ def main():
     postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Doctors',custom_logger,'Deleting doctors table...')
     postgres.run_query_from_file('Queries/PostgreSQL/Deletes/Patients',custom_logger,'Deleting patients table...')
     postgres.close(custom_logger)
-
+   
     number_of_rows = 100000
     custom_logger.info("Number of rows: "+str(number_of_rows))
     postgres = PostgreSQL(postgre_connection_string, custom_logger, database_name)

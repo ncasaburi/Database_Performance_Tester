@@ -19,7 +19,7 @@ cd Databases_Performance_Test/
 ```
 3. Start Mongo and PostgreSQL containers
 ```
-docker-compose up
+docker-compose up -d
 ```
 4. Create environment and install the requirements
 ```
