@@ -1,13 +1,12 @@
 from CustomFaker import CustomFaker
 from tqdm import tqdm
-import random
 import zipfile
 import io
 import os
 
 ####################### Variables ###########################
 
-number_of_rows = 15000
+number_of_rows = 1000000
 
 #############################################################
 
@@ -109,7 +108,7 @@ def create_sql_file(filepath:str, content:str, zip:bool=False):
 
 # Calculation of number of files and rows per file
 
-rows_per_file = 1000
+rows_per_file = 100000
 number_of_files = int(number_of_rows/rows_per_file)
 if rows_per_file == 0 and number_of_rows != 0:
     rows_per_file = number_of_rows

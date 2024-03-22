@@ -3,3 +3,4 @@ psycopg2-binary
 faker
 tqdm
 ansicolors
+console-menu
