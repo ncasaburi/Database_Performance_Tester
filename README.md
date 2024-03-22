@@ -29,7 +29,7 @@ python3 -m venv .venv; . .venv/bin/activate; pip install -r requirements.txt
 ```
 python3 Queries/PostgreSQL/SQLGenerator.py 
 ```
-6. Run performance test
+6. Run performance tests
 ```
 python3 __main__.py
 ```
