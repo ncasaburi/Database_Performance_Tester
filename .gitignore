@@ -1,5 +1,6 @@
 # Entornos virtuales
 .venv
 __pycache__/
-/Queries/__pycache__/
+/data/PostgreSQL/__pycache__/
+/data/Mongo/__pycache__/
 Logs/
