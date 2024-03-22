@@ -3,4 +3,4 @@
 __pycache__/
 /data/PostgreSQL/__pycache__/
 /data/Mongo/__pycache__/
-Logs/
+logs/
