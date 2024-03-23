@@ -9,30 +9,18 @@ import json
 
 ####################### Variables ###########################
 
-number_of_rows = 100
+number_of_rows = 1000000
+rows_per_file = 100000
+
 
 #############################################################
 
 custom_facker = CustomFaker("en_US", 42)
 
-# Generate patients
-# def generate_patient():
-#     return {
-#         'id_patient': faker.unique.random_number(digits=8),
-#         'name': faker.first_name(),
-#         'surname': faker.last_name(),
-#         #'birthday': faker.date_of_birth(minimum_age=18, maximum_age=90),
-#         'birthday': faker.date_of_birth(minimum_age=18, maximum_age=90).strftime('%Y-%m-%d'),  # Convert date to string
-#         'gender': random.choice(['Male', 'Female']),
-#         #'address': faker.street_address(),
-#         #'city': faker.city(),
-#         #'state': faker.state(),
-#         #'phone': faker.phone_number(),
-#     }
-
-def generate_patient():
+def generate_patient(id:int):
     return {
-        'id_patient': custom_facker.unique.random_number(digits=8),
+        #'id_patient': custom_facker.unique.random_number(digits=8),
+        'id_patient': str(id),
         'name': custom_facker.first_name(),
         'surname': custom_facker.last_name(),
         'birthday': custom_facker.date_of_birth(minimum_age=18, maximum_age=98).strftime('%Y-%m-%d'),  # Convert date to string,
@@ -43,22 +31,14 @@ def generate_patient():
         'phone': custom_facker.phone_number(),
     }
 
-# Generate medical record
-# def generate_medical_record():
-#     return {
-#         'id_medical_record': faker.unique.random_number(digits=14),
-#         'admission_date': faker.date_between(start_date='-5y', end_date='today').strftime('%Y-%m-%d'),
-#         'discharge_date': faker.date_between(start_date='-5y', end_date='today').strftime('%Y-%m-%d'),
-#         'diagnosis': random.choice(diagnosis()),  
-#         'treatment': random.choice(treatment()),
-#         'test_result': random.choice(test_result())
-#     }
+
 
 # Generate medical record
 
-def generate_medical_record(id_patient):
+def generate_medical_record(id:int,id_patient:int):
     return {
-        'id_medical_record': custom_facker.unique.random_number(digits=14),
+        #'id_medical_record': custom_facker.unique.random_number(digits=14),
+        'id_medical_record': str(id),
         'id_patient': id_patient,
         'admission_date': custom_facker.date_between(start_date='-5y', end_date='today').strftime('%Y-%m-%d'),  # Convert date to string,
         'discharge_date': custom_facker.date_between(start_date='-5y', end_date='today').strftime('%Y-%m-%d'),  # Convert date to string,
@@ -68,21 +48,13 @@ def generate_medical_record(id_patient):
     }
 
 
-# Generate doctor
-# def generate_doctor():
-#     return {
-#         'id_doctor': faker.unique.random_number(digits=8),
-#         'name': faker.first_name(),
-#         'surname': faker.last_name(),
-#         'profession': random.choice(['Cardiology', 'Pediatrics', 'Gynecology', 'Ophthalmology', 'Dermatology']),
-#     }
-
 
 #Generate doctor
 
-def generate_doctor():
+def generate_doctor(id:int):
     return {
-        'id_doctor': custom_facker.unique.random_number(digits=8),
+        #'id_doctor': custom_facker.unique.random_number(digits=8),
+        'id_doctor': str(id),
         'name': custom_facker.first_name(),
         'surname': custom_facker.last_name(),
         'profession': custom_facker.profession(),
@@ -91,77 +63,108 @@ def generate_doctor():
 
 
 # Generate patients
-print("Generating patients...")
-patients = [generate_patient() for _ in range(number_of_rows)]
+print("Generating patients...") 
 
-# Generate medical records for each patient
-print("Generating medical records...")
-medical_records = []
-for patient in patients:
-    medical_records.append(generate_medical_record(patient['id_patient']))
+patients = []
+for i in tqdm(range(number_of_rows), desc="Generating "+str(number_of_rows)+" patients", ascii=' #'):
+    patient = generate_patient(i)
+    patients.append(patient)
+insert_p_many_json = json.dumps(patients)
+# Convertir la cadena a bytes antes de escribirla en el archivo ZIP
+insert_p_many_bytes = ("db.patient_documents.insertMany(" + insert_p_many_json + ")").encode()
 
 
 # Generate doctors
 print("Generating doctors...") 
-doctors = [generate_doctor() for _ in range(number_of_rows)]
 
-# Create a unique relation between doctors and patients
-perm = random.sample(range(number_of_rows), number_of_rows)
-patient_doctor = []
-for i in perm:
-    patient_doctor.append((patients[i], doctors[i]))
+doctors = []
+for i in tqdm(range(number_of_rows), desc="Generating "+str(number_of_rows)+" doctors", ascii=' #'):
+    doctor = generate_doctor(i)
+    doctors.append(doctor)
+insert_d_many_json = json.dumps(doctors)
+# Convertir la cadena a bytes antes de escribirla en el archivo ZIP
+insert_d_many_bytes = ("db.doctor_documents.insertMany(" + insert_d_many_json + ")").encode()
+ 
+
+
+# Generate medical records for each patient
+print("Generating medical records... and relationship between doctor and medical records")
+
+medicalrecords = []
+doctormedicalrecords = []
+for i in tqdm(range(number_of_rows), desc="Generating "+str(number_of_rows)+" medical records", ascii=' #'):
+    record = generate_medical_record(i,patients[i]['id_patient'])
+
+    doctormedicalrecords.append({
+            'id_doctor': doctors[i]['id_doctor'],
+            'id_medical_record': i
+        })
+    medicalrecords.append(record)
+insert_mr_many_json = json.dumps(medicalrecords)
+# Convertir la cadena a bytes antes de escribirla en el archivo ZIP
+insert_mr_many_bytes = ("db.medicalrecords_documents.insertMany(" + insert_mr_many_json + ")").encode()
+
+insert_dmr_many_json = json.dumps(doctormedicalrecords)
+# Convertir la cadena a bytes antes de escribirla en el archivo ZIP
+insert_dmr_many_bytes = ("db.doctormedicalrecord_documents.insertMany(" + insert_dmr_many_json + ")").encode()
+
 
 
 # Creation of NoSQL files in order to populate tables
+    
+def create_folder(path:str):
+    try:
+        if not os.path.exists(path):
+            print("Creating folder: "+path)
+            os.makedirs(path)
+    except Exception as error:
+        print("An error occured during the creation of path "+path+". The exception is: "+ error)
 
-# if the path doesn't exist
-current_path = "data/Mongo/Inserts/"+str(number_of_rows)+os.path.sep
-if not os.path.exists(current_path):
-    os.makedirs(current_path)
+
+
+
+doctors_path = "data/Mongo/Inserts/Doctors/"
+patients_path = "data/Mongo/Inserts/Patients/"
+medicalrecords_path = "data/Mongo/Inserts/MedicalRecords/"
+doctor_medicalrecords_path = "data/Mongo/Inserts/Doctor_MedicalRecords/"
+
+
+# Calculation of number of files and rows per file
+
+number_of_files = int(number_of_rows/rows_per_file)
+if rows_per_file == 0 and number_of_rows != 0:
+    rows_per_file = number_of_rows
+    number_of_files = 1
+
+# if paths don't exist
+
+create_folder(doctors_path)
+create_folder(patients_path)
+create_folder(medicalrecords_path)
+create_folder(doctor_medicalrecords_path)
 
 
 print("Creating Zip file for patient documents...")
-with zipfile.ZipFile(current_path + str(number_of_rows) + '_Patient_Documents.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
-    
-    insert_many_json = json.dumps(patients)
-    # Convertir la cadena a bytes antes de escribirla en el archivo ZIP
-    insert_many_bytes = ("db.patient_documents.insertMany(" + insert_many_json + ")").encode()
+with zipfile.ZipFile(patients_path + str(number_of_rows) + '_patients_documents.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
     # Escribir la cadena de bytes en el archivo ZIP
-    zipf.writestr(str(number_of_rows) + '_Patient_Documents.js', insert_many_bytes)
+    zipf.writestr(str(number_of_rows) + '_patients_documents.js', insert_p_many_bytes)
 
 
 print("Creating Zip file for doctor documents...")
-with zipfile.ZipFile(current_path+str(number_of_rows)+'_Doctor_Documents.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
-    insert_many_json = json.dumps(doctors)
-    # Convertir la cadena a bytes antes de escribirla en el archivo ZIP
-    insert_many_bytes = ("db.doctor_documents.insertMany(" + insert_many_json + ")").encode()
+with zipfile.ZipFile(doctors_path+str(number_of_rows)+'_doctors_documents.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
     # Escribir la cadena de bytes en el archivo ZIP
-    zipf.writestr(str(number_of_rows) + '_Doctor_Documents.js', insert_many_bytes)
+    zipf.writestr(str(number_of_rows) + '_doctors_documents.js', insert_d_many_bytes)
 
 
 print("Creating Zip file for medical record documents...")
-with zipfile.ZipFile(current_path+str(number_of_rows)+'_MedicalRecord_Documents.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
-    insert_many_json = json.dumps(medical_records)
-    # Convertir la cadena a bytes antes de escribirla en el archivo ZIP
-    insert_many_bytes = ("db.medicalrecords_documents.insertMany(" + insert_many_json + ")").encode()
+with zipfile.ZipFile(medicalrecords_path+str(number_of_rows)+'_medicalrecords_documents.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
     # Escribir la cadena de bytes en el archivo ZIP
-    zipf.writestr(str(number_of_rows) + '_MedicalRecord_Documents.js', insert_many_bytes)
+    zipf.writestr(str(number_of_rows) + '_medicalrecords_documents.js', insert_mr_many_bytes)
 
 
-print("Creating Zip file for the relationships among patients, doctors and medical records (documents)...")
-with zipfile.ZipFile(current_path + str(number_of_rows) + '_DoctorMedicalRecord_Documents.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
-    patient_doctor_medical_records_in_memory = []
-    for record in medical_records:
-        patient_doctor_medical_records_in_memory.append({
-            'id_doctor': patient_doctor[0][1]['id_doctor'],
-            'id_medical_record': record['id_medical_record']
-        })
-        record['id_patient'] = patient_doctor[0][0]['id_patient']
-        del patient_doctor[0]
-    insert_many_json = json.dumps(patient_doctor_medical_records_in_memory)
-    # Convertir la cadena a bytes antes de escribirla en el archivo ZIP
-    insert_many_bytes = ("db.doctormedicalrecord_documents.insertMany(" + insert_many_json + ")").encode()
+print("Creating Zip file for the relationships among doctors and medical records (documents)...")
+with zipfile.ZipFile( doctor_medicalrecords_path+ str(number_of_rows) + '_doctor_medicalrecords_documents.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
     # Escribir la cadena de bytes en el archivo ZIP
-    zipf.writestr(str(number_of_rows) + '_DoctorMedicalRecord_Documents.js', insert_many_bytes)
+    zipf.writestr(str(number_of_rows) + '_doctor_medicalrecords_documents.js', insert_dmr_many_bytes)
 
 
