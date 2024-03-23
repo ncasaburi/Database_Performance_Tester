@@ -9,7 +9,7 @@ import json
 
 ####################### Variables ###########################
 
-number_of_rows = 1000000
+number_of_rows = 100
 rows_per_file = 100000
 
 
@@ -71,7 +71,7 @@ for i in tqdm(range(number_of_rows), desc="Generating "+str(number_of_rows)+" pa
     patients.append(patient)
 insert_p_many_json = json.dumps(patients)
 # Convertir la cadena a bytes antes de escribirla en el archivo ZIP
-insert_p_many_bytes = ("db.patient_documents.insertMany(" + insert_p_many_json + ")").encode()
+insert_p_many_bytes = ("db.patients_documents.insertMany(" + insert_p_many_json + ")").encode()
 
 
 # Generate doctors
@@ -83,7 +83,7 @@ for i in tqdm(range(number_of_rows), desc="Generating "+str(number_of_rows)+" do
     doctors.append(doctor)
 insert_d_many_json = json.dumps(doctors)
 # Convertir la cadena a bytes antes de escribirla en el archivo ZIP
-insert_d_many_bytes = ("db.doctor_documents.insertMany(" + insert_d_many_json + ")").encode()
+insert_d_many_bytes = ("db.doctors_documents.insertMany(" + insert_d_many_json + ")").encode()
  
 
 
@@ -106,7 +106,7 @@ insert_mr_many_bytes = ("db.medicalrecords_documents.insertMany(" + insert_mr_ma
 
 insert_dmr_many_json = json.dumps(doctormedicalrecords)
 # Convertir la cadena a bytes antes de escribirla en el archivo ZIP
-insert_dmr_many_bytes = ("db.doctormedicalrecord_documents.insertMany(" + insert_dmr_many_json + ")").encode()
+insert_dmr_many_bytes = ("db.doctormedicalrecords_documents.insertMany(" + insert_dmr_many_json + ")").encode()
 
 
 
