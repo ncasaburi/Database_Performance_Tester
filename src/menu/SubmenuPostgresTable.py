@@ -46,7 +46,9 @@ class SubmenuPostgresTable():
         else:
             print("Tables:\n")
             for table in table_list:
-                print("- "+str(table[0]))
-            print("\nPress enter to continue")
+                print(" - "+str(table[0])+" (rows: "+str(postgres.run_query("SELECT COUNT(*) FROM "+str(table[0]),"",expected_result=True)[0][0])+", columns: "+str(postgres.run_query("SELECT COUNT(*) FROM information_schema.columns WHERE table_name = '"+str(table[0])+"';","",expected_result=True)[0][0])+")")
+                print("   ("+', '.join(item[0] for item in postgres.run_query("SELECT column_name FROM information_schema.columns WHERE table_name = '"+str(table[0])+"'","",expected_result=True))+")")
+                print("")
+            print("Press enter to continue...")
             input()
             return
