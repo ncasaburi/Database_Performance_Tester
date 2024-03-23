@@ -12,10 +12,10 @@ class CustomLogger(logging.getLoggerClass()):
         self.setLevel(logging.DEBUG)
         
         # Create stream handler for logging to stdout
-        self.stdout_handler = logging.StreamHandler(sys.stdout)
-        self.stdout_handler.setLevel(logging.DEBUG)
-        self.stdout_handler.setFormatter(logging.Formatter('%(message)s'))
-        self.addHandler(self.stdout_handler)
+        # self.stdout_handler = logging.StreamHandler(sys.stdout)
+        # self.stdout_handler.setLevel(logging.DEBUG)
+        # self.stdout_handler.setFormatter(logging.Formatter('%(message)s'))
+        # self.addHandler(self.stdout_handler)
         
         # Add file handler only if the log directory was specified
         if log_dir:
