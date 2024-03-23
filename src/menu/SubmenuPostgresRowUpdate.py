@@ -39,7 +39,7 @@ class SubmenuPostgresRowUpdate():
                         input("Press enter to continue")
                         rows_to_update = rows_left
 
-                postgres.run_query("UPDATE medical_records SET discharge_date = '"+datetime.now().strftime('%Y-%m-%d')+"' WHERE id_medical_record IN ( SELECT id_medical_record FROM medical_records ORDER BY id_medical_record DESC LIMIT "+str(rows_to_update)+")","Updating "+str(rows_to_update)+" relationships between doctors and medical records...")
+                postgres.run_query("UPDATE medical_records SET discharge_date = '"+datetime.now().strftime('%Y-%m-%d')+"' WHERE id_medical_record IN ( SELECT id_medical_record FROM medical_records ORDER BY id_medical_record DESC LIMIT "+str(rows_to_update)+")","Updating "+str(rows_to_update)+" medical records...")
                 postgres.run_query("UPDATE patients SET name = 'Robert' WHERE id_patient IN ( SELECT id_patient FROM patients ORDER BY id_patient DESC LIMIT "+str(rows_to_update)+" )", "Updating "+str(rows_to_update)+" patients...")
                 postgres.run_query("UPDATE doctors SET name = 'Mark' WHERE id_doctor IN ( SELECT id_doctor FROM doctors ORDER BY id_doctor DESC LIMIT "+str(rows_to_update)+" )", "Updating "+str(rows_to_update)+" doctors...")
 
