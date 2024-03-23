@@ -4,9 +4,11 @@ import zipfile
 import io
 import os
 
+
 ####################### Variables ###########################
 
-number_of_rows = 1000000
+number_of_rows = 15000
+rows_per_file = 1000
 
 #############################################################
 
@@ -14,9 +16,10 @@ custom_facker = CustomFaker("en_US", 42)
 
 # Generate patients
 
-def generate_patient():
+def generate_patient(id:int):
     return {
-        'id_patient': custom_facker.unique.random_number(digits=8),
+        #'id_patient': custom_facker.unique.random_number(digits=8),
+        'id_patient': str(id),
         'name': custom_facker.first_name(),
         'surname': custom_facker.last_name(),
         'birthday': custom_facker.date_of_birth(minimum_age=18, maximum_age=98),
@@ -29,9 +32,10 @@ def generate_patient():
 
 # Generate medical record
 
-def generate_medical_record():
+def generate_medical_record(id:int):
     return {
-        'id_medical_record': custom_facker.unique.random_number(digits=14),
+        #'id_medical_record': custom_facker.unique.random_number(digits=14),
+        'id_medical_record': str(id),
         'id_patient': None,
         'admission_date': custom_facker.date_between(start_date='-5y', end_date='today'),
         'discharge_date': custom_facker.date_between(start_date='-5y', end_date='today'),
@@ -42,9 +46,10 @@ def generate_medical_record():
 
 # Generate doctor
 
-def generate_doctor():
+def generate_doctor(id:int):
     return {
-        'id_doctor': custom_facker.unique.random_number(digits=8),
+        #'id_doctor': custom_facker.unique.random_number(digits=8),
+        'id_doctor': str(id),
         'name': custom_facker.first_name(),
         'surname': custom_facker.last_name(),
         'profession': custom_facker.profession(),
@@ -54,8 +59,8 @@ def generate_doctor():
 
 patients = []
 patients_sql = []
-for _ in tqdm(range(number_of_rows), desc="Generating "+str(number_of_rows)+" patients", ascii=' #'):
-    patient = generate_patient()
+for i in tqdm(range(number_of_rows), desc="Generating "+str(number_of_rows)+" patients", ascii=' #'):
+    patient = generate_patient(i)
     patients.append(patient)
     patients_sql.append(f"INSERT INTO patients (id_patient, name, surname, birthday, gender, address, city, state, phone) VALUES ('{patient['id_patient']}','{patient['name']}', '{patient['surname']}', '{patient['birthday']}', '{patient['gender']}', '{patient['address']}', '{patient['city']}', '{patient['state']}', '{patient['phone']}');")
 
@@ -63,8 +68,8 @@ for _ in tqdm(range(number_of_rows), desc="Generating "+str(number_of_rows)+" pa
     
 doctors = []
 doctors_sql = []
-for _ in tqdm(range(number_of_rows), desc="Generating "+str(number_of_rows)+" doctors", ascii=' #'):
-    doctor = generate_doctor()
+for i in tqdm(range(number_of_rows), desc="Generating "+str(number_of_rows)+" doctors", ascii=' #'):
+    doctor = generate_doctor(i)
     doctors.append(doctor)
     doctors_sql.append(f"INSERT INTO doctors (id_doctor, name, surname, profession) VALUES ('{doctor['id_doctor']}','{doctor['name']}', '{doctor['surname']}', '{doctor['profession']}');")
 
@@ -75,7 +80,7 @@ medicalrecords_sql = []
 doctor_medicalrecords = []
 doctor_medicalrecords_sql = []
 for i in tqdm(range(number_of_rows), desc="Generating "+str(number_of_rows)+" medical records", ascii=' #'):
-    record = generate_medical_record()
+    record = generate_medical_record(i)
     record_dmr = "INSERT INTO doctor_medical_records (id_doctor, id_medical_record) VALUES ('"+str(doctors[i]['id_doctor'])+"','"+str(record['id_medical_record'])+"');"  
     doctor_medicalrecords.append(record_dmr)
     doctor_medicalrecords_sql.append(record_dmr)
@@ -108,7 +113,6 @@ def create_sql_file(filepath:str, content:str, zip:bool=False):
 
 # Calculation of number of files and rows per file
 
-rows_per_file = 100000
 number_of_files = int(number_of_rows/rows_per_file)
 if rows_per_file == 0 and number_of_rows != 0:
     rows_per_file = number_of_rows
