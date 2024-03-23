@@ -25,49 +25,53 @@ class SubmenuPostgresRowInsert():
     
     def get(self) -> ConsoleMenu:
         return self.submenu_postgres_row_insert
-    
+
     def postgres_row_insert_fn(self, type:str):
         """This function allows the user to insert rows into a PostgreSQL database"""       
+        
         try:
             postgres = PostgreSQL()
             if type == "default":
-                if Config().default_sql_doctors == "":
-                    Config().default_sql_doctors = self._join_sql_row_inserts(Config().default_data["default_postgres_inserts"]+"Doctors"+os.path.sep+Config().default_memory["default_row_set"]+"_doctors_set",Config().default_memory["default_insert_files"])
-                if Config().default_sql_patients == "":
-                    Config().default_sql_patients = self._join_sql_row_inserts(Config().default_data["default_postgres_inserts"]+"Patients"+os.path.sep+Config().default_memory["default_row_set"]+"_patients_set",Config().default_memory["default_insert_files"])
-                if Config().default_sql_medicalrecords == "":
-                    Config().default_sql_medicalrecords = self._join_sql_row_inserts(Config().default_data["default_postgres_inserts"]+"MedicalRecords"+os.path.sep+Config().default_memory["default_row_set"]+"_medicalrecords_set",Config().default_memory["default_insert_files"])
-                if Config().default_sql_doctor_medicalrecords == "":
-                    Config().default_sql_doctor_medicalrecords = self._join_sql_row_inserts(Config().default_data["default_postgres_inserts"]+"Doctor_MedicalRecords"+os.path.sep+Config().default_memory["default_row_set"]+"_doctor_medicalrecords_set",Config().default_memory["default_insert_files"])
-                
+                default_row_set = int(Config().default_memory["default_row_set"])
+                default_number_files = int(Config().default_memory["default_insert_files"])
+
                 actual_doctor_rows = postgres.run_query("SELECT COUNT(*) FROM doctors","",expected_result=True)[0][0]
                 actual_patient_rows = postgres.run_query("SELECT COUNT(*) FROM patients","",expected_result=True)[0][0]
                 actual_medicalrecord_rows = postgres.run_query("SELECT COUNT(*) FROM medical_records","",expected_result=True)[0][0]
                 actual_doctormedicalrecord_rows = postgres.run_query("SELECT COUNT(*) FROM doctor_medical_records","",expected_result=True)[0][0]
                 if actual_doctor_rows == 0 and actual_patient_rows == 0 and actual_medicalrecord_rows == 0 and actual_doctormedicalrecord_rows == 0:
                     Config().default_lines_read = 0
-                total_rows = int(Config().default_memory["default_insert_files"]) * int(Config().default_memory["default_row_set"])
-                rows_left = total_rows-int(Config().default_lines_read)
-                print("rows_left: "+str(rows_left))
-                print("default_lines: "+str(Config().default_lines_read))
+                    Config().default_last_file_read = 0
+
+                rows_left = (default_row_set * default_number_files) - Config().default_lines_read
+
+                #If there are rows left and tables count of rows is the same as the number stored on variable default_lines_read
                 if rows_left > 0 and actual_doctor_rows == Config().default_lines_read and actual_patient_rows == Config().default_lines_read and actual_medicalrecord_rows == Config().default_lines_read and actual_doctormedicalrecord_rows == Config().default_lines_read:
                     os.system('clear')
-                    print("Please, enter the number of rows you want to insert: ("+str(rows_left)+" default rows left)")
+                    print("Please, enter the number of rows you want to insert: ("+str(rows_left)+" rows left)")
                     requested_rows = int(input())
-                    limit = int(Config().default_lines_read) + requested_rows
+
                     if requested_rows > rows_left:
-                        print("The number of rows requested exceed the number of rows left")
-                        print("As a result, "+str(rows_left)+" rows will be inserted")
-                        limit = int(Config().default_lines_read)+rows_left
+                        print("The number of rows requested exceed the number of rows left.\nAs a result, "+str(rows_left)+" rows will be inserted")
+                        input("Press enter to continue")
                         requested_rows = rows_left
-                    postgres.run_query(' '.join(map(str, Config().default_sql_doctors[int(Config().default_lines_read)+1:limit+1])),"Adding "+str(requested_rows)+" doctors...")
-                    postgres.run_query(' '.join(map(str, Config().default_sql_patients[int(Config().default_lines_read)+1:limit+1])),"Adding "+str(requested_rows)+" patients...")
-                    postgres.run_query(' '.join(map(str, Config().default_sql_medicalrecords[int(Config().default_lines_read)+1:limit+1])),"Adding "+str(requested_rows)+" medical records...")
-                    postgres.run_query(' '.join(map(str, Config().default_sql_doctor_medicalrecords[int(Config().default_lines_read)+1:limit+1])),"Adding "+str(requested_rows)+" relationships between doctors and medical records...")
-                    Config().default_lines_read = limit
+                    
+                    os.system('clear')
+                    print("Doctors:")
+                    self._load_sql_content("Doctors", requested_rows, default_row_set, Config().default_lines_read, Config().default_last_file_read, postgres)
+                    os.system('clear')
+                    print("Patients:")
+                    self._load_sql_content("Patients", requested_rows, default_row_set, Config().default_lines_read, Config().default_last_file_read, postgres)
+                    os.system('clear')
+                    print("MedicalRecords:")
+                    self._load_sql_content("MedicalRecords", requested_rows, default_row_set, Config().default_lines_read, Config().default_last_file_read, postgres)
+                    os.system('clear')
+                    print("Doctors - MedicalRecords:")
+                    (requested_rows, default_row_set,Config().default_lines_read,Config().default_last_file_read) = self._load_sql_content("Doctor_MedicalRecords", requested_rows, default_row_set, Config().default_lines_read, Config().default_last_file_read, postgres)
                 else:
                     os.system('clear')
-                    print("\nPlease clean the default tables")
+                    print("\nPlease, clean the default tables")
+                    input("\nPress enter to go back to the menu")
             else:
                 os.system('clear')
                 print("Enter the query to insert the rows: \nExample: INSERT INTO tablename (colname1, colname2, colname3) VALUES ('value1','value2', 'value3');\n")
@@ -77,15 +81,48 @@ class SubmenuPostgresRowInsert():
                     postgres.run_query(query, "Inserting custom rows...")
                 else:
                     print("\nThe query must begin with INSERT INTO")
-            print("\nPress enter to go back to the menu")
-            input()
+                    input("\nPress enter to go back to the menu")
         except:
-            SingleLogger().logger.exception("Error while inserting default rows to PostgreSQL", exc_info=True)
-    
-    def _join_sql_row_inserts(self, filepath:str, number_of_files:int) -> str:
-        """This function joins all files of the same type into one string variable"""
-        
-        draft_rows_inserts = ""
-        for i in range(int(number_of_files)):
-                draft_rows_inserts = draft_rows_inserts+"\n"+Zipper().unzip_content(filepath+str(i)+".zip","sql")
-        return draft_rows_inserts.splitlines()
+            SingleLogger().logger.exception("Error while inserting rows to PostgreSQL", exc_info=True)
+
+    def _load_sql_content(self, element:str, requested_rows:int, default_row_set:int, default_lines_read, default_last_file_read, postgres) -> list:
+
+        current_file_row = default_lines_read - (default_last_file_read* default_row_set)
+                
+        content_sql = ""        
+        pending_rows = requested_rows
+
+        print("\n  loading data...")
+        #While the requested number of rows involves more than one file
+        while current_file_row + pending_rows >= default_row_set:
+            requested_rows_aux = default_row_set - current_file_row
+
+            #Unzipping and storing rows
+            if content_sql == "": #If this is the first iteration
+                content_sql = content_sql + '\n'.join(map(str, Zipper().unzip_content(Config().default_data["default_postgres_inserts"]+element+os.path.sep+str(default_row_set)+"_"+element.lower()+"_set"+str(default_last_file_read)+".zip","sql").splitlines()[current_file_row:default_row_set]))
+            else:
+                content_sql = content_sql +'\n'+'\n'.join(map(str, Zipper().unzip_content(Config().default_data["default_postgres_inserts"]+element+os.path.sep+str(default_row_set)+"_"+element.lower()+"_set"+str(default_last_file_read)+".zip","sql").splitlines()[current_file_row:default_row_set]))
+                
+            default_lines_read = default_lines_read + requested_rows_aux
+            pending_rows = pending_rows - requested_rows_aux
+            current_file_row = 0
+            default_last_file_read = default_last_file_read + 1
+
+        #If there are still rows pending to be added but they are fewer than the number of rows per file
+        if pending_rows > 0:
+            max_row_number = pending_rows + current_file_row
+            
+            #Unzipping and storing rows
+            if content_sql == "": #If this is the first iteration
+                content_sql = content_sql + '\n'.join(map(str, Zipper().unzip_content(Config().default_data["default_postgres_inserts"]+element+os.path.sep+str(default_row_set)+"_"+element.lower()+"_set"+str(default_last_file_read)+".zip","sql").splitlines()[current_file_row:max_row_number]))
+            else:
+                content_sql = content_sql +'\n'+'\n'.join(map(str, Zipper().unzip_content(Config().default_data["default_postgres_inserts"]+element+os.path.sep+str(default_row_set)+"_"+element.lower()+"_set"+str(default_last_file_read)+".zip","sql").splitlines()[current_file_row:max_row_number]))
+                
+            default_lines_read = default_lines_read + pending_rows
+            current_file_row = pending_rows + 1
+            pending_rows = 0                
+        #Inserting rows
+        print("  inserting rows...")
+        postgres.run_query(content_sql,"Adding "+str(len(content_sql.splitlines()))+" "+element.lower()+"...")
+        return (requested_rows,default_row_set,default_lines_read,default_last_file_read)
+
