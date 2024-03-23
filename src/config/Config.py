@@ -4,10 +4,7 @@ class Config():
     _instance = None
     _config = None
     _default_lines_read = 0
-    _default_sql_doctors = ""
-    _default_sql_patients = ""
-    _default_sql_medicalrecords = ""
-    _default_sql_doctor_medicalrecords = ""
+    _default_last_file_read = 0
 
     def __new__(cls):
 
@@ -50,33 +47,9 @@ class Config():
         self._default_lines_read = value
 
     @property
-    def default_sql_doctors(self):
-        return self._default_sql_doctors
+    def default_last_file_read(self):
+        return self._default_last_file_read
     
-    @default_sql_doctors.setter
-    def default_sql_doctors(self, value):
-        self._default_sql_doctors = value
-    
-    @property
-    def default_sql_patients(self):
-        return self._default_sql_patients
-    
-    @default_sql_patients.setter
-    def default_sql_patients(self, value):
-        self._default_sql_patients = value
-
-    @property
-    def default_sql_medicalrecords(self):
-        return self._default_sql_medicalrecords
-    
-    @default_sql_medicalrecords.setter
-    def default_sql_medicalrecords(self, value):
-        self._default_sql_medicalrecords = value
-    
-    @property
-    def default_sql_doctor_medicalrecords(self):
-        return self._default_sql_doctor_medicalrecords
-    
-    @default_sql_doctor_medicalrecords.setter
-    def default_sql_doctor_medicalrecords(self, value):
-        self._default_sql_doctor_medicalrecords = value
+    @default_last_file_read.setter
+    def default_last_file_read(self, value):
+        self._default_last_file_read = value
