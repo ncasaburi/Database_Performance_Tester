@@ -1,6 +1,7 @@
 from consolemenu import *
 from consolemenu.items import *
-from src.menu.SubmenuPostgres import SubmenuPostgres
+from src.menu.SubmenuPostgres.SubmenuPostgres import SubmenuPostgres
+from src.menu.SubmenuMongo.SubmenuMongo import SubmenuMongo
 from src.menu.status import status
 
 class MainMenu():
@@ -13,7 +14,7 @@ class MainMenu():
 
         #menu items
         menu_postgres = SubmenuItem("PostgreSQL", SubmenuPostgres().get(), menu)
-        menu_mongo = MenuItem("MongoDB")
+        menu_mongo = SubmenuItem("MongoDB", SubmenuMongo().get(), menu)
 
         #menu appends
         menu.append_item(menu_postgres)

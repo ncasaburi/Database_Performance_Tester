@@ -1,5 +1,5 @@
 from src.drivers.PostgreSQLDriver import PostgreSQL
-from src.drivers.MongoDriver import MongoDB
+from src.drivers.MongoDBDriver import MongoDB
 from src.logger.CustomLogger import CustomLogger
 from src.logger.SingleLogger import SingleLogger
 from src.menu.MainMenu import MainMenu
