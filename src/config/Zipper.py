@@ -40,9 +40,12 @@ class Zipper():
             sys.exit(1)
     
     def _create_folder(self, path:str):
+        """This function creates a folder if it doesn't exist"""
+
         try:
             if not os.path.exists(path):
-                print("Creating folder: "+path)
                 os.makedirs(path)
+                SingleLogger().logger.info(f"Created folder: {path}")
         except Exception as error:
-            print("An error occured during the creation of path "+path+". The exception is: "+ error)
+            SingleLogger().logger.exception("An error occured during the creation of path "+path, exc_info=True)
+            sys.exit(1)
