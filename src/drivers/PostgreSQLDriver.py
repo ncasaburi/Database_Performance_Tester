@@ -1,11 +1,7 @@
 from src.logger.SingleLogger import SingleLogger
 import psycopg2
-from tqdm import tqdm
-#from psycopg2 import errors
 import time
 import sys
-import zipfile
-import os
 
 class PostgreSQL():
     _instance = None
@@ -25,6 +21,7 @@ class PostgreSQL():
 
         try:
             if hasattr(self, 'cursor') and self.cursor:
+                #return "hospital (PostgreSQL)"
                 return self.cursor.connection.get_dsn_parameters()["dbname"]
             else:
                 return "Disconnected"
@@ -119,80 +116,6 @@ class PostgreSQL():
             SingleLogger().logger.exception("Error while running query to PostgreSQL", exc_info=True)
             sys.exit(1)
             
-    # def run_query(self, transactions:list, description:str="", expected_result:bool=False):
-    #     """This function executes a query and prints the description and returns a list with the results"""
-
-    #     try:
-    #         SingleLogger().logger.info("Executing sql query...")
-    #         if not description == "":
-    #             SingleLogger().logger.info(description)
-    #         start_counter = time.time()
-    #         with tqdm(total=len(transactions)) as pbar:
-    #             for i in range(len(transactions)):
-    #                 self.cursor.execute(transactions[i])
-    #                 pbar.update(1)
-    #         stop_counter = time.time()
-    #         SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
-    #         SingleLogger().logger.info("The sql query has been executed")
-    #         if expected_result == True and self.cursor.rowcount > 0:
-    #             return self.cursor.fetchall()
-    #     except Exception:
-    #         SingleLogger().logger.exception("Error while running query to PostgreSQL", exc_info=True)
-    #         sys.exit(1)
-
-    def run_query_from_file(self, path:str, internal:bool, internal_description:str=""):
-        """This function executes a query from a sql file and prints the description and returns a list with the results"""
-
-        try:
-            (base,extension) = os.path.basename(path)
-            if extension != ".sql":
-                raise Exception("The file must be sql")
-            if not internal_description == "" and internal == True:
-                SingleLogger().logger.info(internal_description)
-            elif internal == False:
-                SingleLogger().logger.info("Executing the sql file "+os.path.basename(path)+"...")
-            with open(path, 'r') as file:
-                query = file.read()
-                start_counter = time.time()
-                self.cursor.execute(query)
-                stop_counter = time.time()
-                print("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
-                if internal == False:
-                    SingleLogger().logger.info("The sql file "+os.path.basename(path)+" has been executed")
-            if self.cursor.rowcount > 0:
-                return self.cursor.fetchall()
-        except:
-            SingleLogger().logger.exception("Error while running query from the sql file "+os.path.basename(path)+" to PostgreSQL", exc_info=True)
-            sys.exit(1)
-
-    def run_query_from_zip(self, path, internal:bool, internal_description:str=""):
-        """This function executes a query from a sql zipped file and prints the description. The sql file must have the same name as the zip. This function returns a list with the resoults"""
-
-        try:
-            base,extension = os.path.splitext(path)
-            if extension != ".zip":
-                raise Exception("The file must be zip")
-            if not internal_description == "" and internal == True:
-                SingleLogger().logger.info(internal_description)
-            elif internal == False:
-                SingleLogger().logger.info("Executing the zip file "+os.path.basename(path)+"...")
-            with zipfile.ZipFile(path, 'r') as zip_ref:
-                path, extension = os.path.splitext(path)
-                file_path = os.path.basename(path+'.sql')
-                with zip_ref.open(file_path, 'r') as file:
-                    query = file.read()
-                    start_counter = time.time()
-                    self.cursor.execute(query)
-                    stop_counter = time.time()
-                    SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
-                    if internal == False:
-                        SingleLogger().logger.info("The zip file "+os.path.basename(path)+" has been executed")
-            if self.cursor.rowcount > 0:
-                return self.cursor.fetchall()
-        except Exception:
-            SingleLogger().logger.exception("Error while running query from the zip file "+os.path.basename(path)+" to PostgreSQL", exc_info=True)
-            sys.exit(1)
-
     def close(self):
         """This function closes the cursor and connection"""
 
