@@ -9,7 +9,7 @@ import json
 
 ####################### Variables ###########################
 
-number_of_rows = 100
+number_of_rows = 1000000
 rows_per_file = 100000
 
 
@@ -26,9 +26,9 @@ def generate_patient(id:int):
         'birthday': custom_facker.date_of_birth(minimum_age=18, maximum_age=98).strftime('%Y-%m-%d'),  # Convert date to string,
         'gender': custom_facker.gender(),
         'address': custom_facker.street_address(),
-        'city': custom_facker.city(),
-        'state': custom_facker.state(),
-        'phone': custom_facker.phone_number(),
+        #'city': custom_facker.city(),
+        #'state': custom_facker.state(),
+        #'phone': custom_facker.phone_number(),
     }
 
 
@@ -40,8 +40,8 @@ def generate_medical_record(id:int,id_patient:int):
         #'id_medical_record': custom_facker.unique.random_number(digits=14),
         'id_medical_record': str(id),
         'id_patient': id_patient,
-        'admission_date': custom_facker.date_between(start_date='-5y', end_date='today').strftime('%Y-%m-%d'),  # Convert date to string,
-        'discharge_date': custom_facker.date_between(start_date='-5y', end_date='today').strftime('%Y-%m-%d'),  # Convert date to string,
+        #'admission_date': custom_facker.date_between(start_date='-5y', end_date='today').strftime('%Y-%m-%d'),  # Convert date to string,
+        #'discharge_date': custom_facker.date_between(start_date='-5y', end_date='today').strftime('%Y-%m-%d'),  # Convert date to string,
         'diagnosis': custom_facker.diagnosis(),  
         'treatment': custom_facker.treatment(),
         'test_result': custom_facker.test_result(),

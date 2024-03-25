@@ -20,13 +20,13 @@ def main():
     # # Create MongoDB instance
     mongo = MongoDB(mongodb_connection_string, custom_logger, database_name)
     # # Execute operations from 500_Doctors.zip file
-    number_of_rows = 100
+    number_of_rows = 1000000
     custom_logger.info("MongoDB Stress Test - Number of transaction: "+str(number_of_rows))
     custom_logger.info("*********************************************************")
     mongo.execute_operations_from_file(custom_logger,'data/Mongo/Inserts/Patients/'+str(number_of_rows)+'_patients_documents','Populating patients_documents collection...')
-    # mongo.execute_operations_from_file(custom_logger,'data/Mongo/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_Doctor_Documents','Populating Doctor_Documents collection...')
-    # mongo.execute_operations_from_file(custom_logger,'data/Mongo/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_MedicalRecord_Documents','Populating medical record documents collection...')
-    # mongo.execute_operations_from_file(custom_logger,'data/Mongo/Inserts/'+str(number_of_rows)+os.path.sep+str(number_of_rows)+'_DoctorMedicalRecord_Documents','Populating relationships documents collection...')
+    mongo.execute_operations_from_file(custom_logger,'data/Mongo/Inserts/Doctors/'+str(number_of_rows)+'_doctors_documents','Populating Doctor_Documents collection...')
+    mongo.execute_operations_from_file(custom_logger,'data/Mongo/Inserts/MedicalRecords/'+str(number_of_rows)+'_medicalrecords_documents','Populating medical record documents collection...')
+    mongo.execute_operations_from_file(custom_logger,'data/Mongo/Inserts/Doctor_MedicalRecords/'+str(number_of_rows)+'_doctor_medicalrecords_documents','Populating relationships documents collection...')
 
 
     #Fin Configuración Mongo
