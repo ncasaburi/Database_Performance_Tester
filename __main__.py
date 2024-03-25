@@ -35,10 +35,16 @@ def main():
 
     mongo = MongoDB()
 
+    # mongo.connect(Config().default_dbs["default_mongo_connection_string"],Config().default_dbs["default_database_name"])
+  
+    # mongo.create_collection('patients')
+    # mongo.list_collections()
+
     postgres = PostgreSQL()
 
     MainMenu()
 
     postgres.close()
     
+    #mongo.close()
 main()

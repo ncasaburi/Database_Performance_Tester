@@ -1,21 +1,3 @@
-# from pymongo import MongoClient
-
-# def mongo_connection(db_connection_string, db_name):
-#     """This function establishes the connection with Mongo"""
-    
-#     try:
-#         conn = MongoClient(db_connection_string)
-#         list_databases = conn.list_database_names()
-#         print(list_databases)
-#         if not db_name in list_databases:
-#             print("The database: \""+db_name+"\" doesn't exist on Mongo. Creating database...")
-#             db = conn[db_name]
-#             print("Database created")
-#             return db
-#         db = conn[db_name]
-#     except Exception as error:
-#         print("Error while connecting to MongoDB:", error)
-#     return db
 from src.logger.SingleLogger import SingleLogger
 from pymongo import MongoClient
 import sys
@@ -103,7 +85,7 @@ class MongoDB():
         try:
             SingleLogger().logger.info("Connecting to "+db_connection_string+db_name+" on MongoDB...")
             start_counter = time.time()
-            self.conn = MongoClient(db_connection_string)
+            self.conn = MongoClient(db_connection_string)[db_name]
             stop_counter = time.time()
             SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
             SingleLogger().logger.info("Connection with "+db_connection_string+db_name+" has been established")
@@ -186,6 +168,49 @@ class MongoDB():
         except Exception:
             SingleLogger().logger.exception("Error while closing MongoDB cursor and connection", exc_info=True)
             sys.exit(1)
+
+    def list_collections(self):
+        try:
+            collections = self.conn.list_collection_names()
+            return collections
+        except Exception as error:
+            SingleLogger().logger.exception("Error while listing collections", exc_info=True)
+            return None
+        
+    def create_collection(self, collection_name):
+        try:
+            self.conn.create_collection(collection_name)
+            SingleLogger().logger.info("Collection '{}' created successfully.".format(collection_name))
+            return True
+        except Exception as error:
+            SingleLogger().logger.exception("Error while creating collection '{}'".format(collection_name), exc_info=True)
+            return False
+
+    def drop_collection(self, collection_name):
+        try:
+            self.conn.drop_collection(collection_name)
+            SingleLogger().logger.info("Collection '{}' droped successfully.".format(collection_name))
+            return True
+        except Exception as error:
+            SingleLogger().logger.exception("Error while droping collection '{}'".format(collection_name), exc_info=True)
+            return False
+
+    def exist_collection(self, collection_name):
+        """This function checks whether the collection exists or not"""
+
+        try:
+            SingleLogger().logger.info("Checking whether collection "+collection_name+" exist or not...")
+            collections = self.list_collections()  # Llamar al método para obtener la lista de colecciones
+            if collections is not None and collection_name in collections:   
+                SingleLogger().logger.info("Collection "+collection_name+" already exists")
+                return True
+            else:
+                SingleLogger().logger.info("Collection "+collection_name+" doesn't exist")
+                return False   
+        except Exception:
+            SingleLogger().logger.exception("Error while checking MongoDB Collection existence", exc_info=True)
+            sys.exit(1)
+
 
     @property
     def connection_string(self):

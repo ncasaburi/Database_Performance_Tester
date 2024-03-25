@@ -30,37 +30,28 @@ class SubmenuMongoCollectionCreate():
         try:
             mongo = MongoDB()
             mongo.connect(Config().default_dbs["default_mongo_connection_string"],Config().default_dbs["default_database_name"])
-            db = mongo.conn(Config().default_dbs["default_database_name"])
             if type == "default":
-                db.create_collection('patients')
-                db.create_collection('doctors')
-                db.create_collection('doctor_medical_records')
-                db.create_collection('medical_records')
-                SingleLogger().logger.info("Creating default collections...")
+                SingleLogger().logger.info("Creating default collections...")                
+                if not mongo.exist_collection('patients'):
+                    mongo.create_collection('patients')
+
+                if not mongo.exist_collection('doctors'):    
+                    mongo.create_collection('doctors')
+                 
+                if not mongo.exist_collection('doctor_medical_records'):
+                    mongo.create_collection('doctor_medical_records')
+
+                if not mongo.exist_collection('medical_records'):
+                    mongo.create_collection('medical_records')
+
+
             else:
-                print("Enter the query create collection \nExample: db.createCollection(collectionname)\n");
+                SingleLogger().logger.info("Creating custom collection...")                
+                print("Enter the name collection to create\n");
                 collectionname = input()
                 collectionname = collectionname.lower()
-                if collectionname.startswith("db.createCollection"):
-                    db.create_collection(collectionname)
-                else:
-                    print("\nThe query must begin with db.createCollection")
-                    print("\nPress enter to go back to the menu")
-                    input()            
+                if not mongo.exist_collection(collectionname):
+                    mongo.create_collection(collectionname)
+
         except:
             SingleLogger().logger.exception("Error while creating to a MongoDB collections", exc_info=True)
-
-        # postgres = PostgreSQL()
-        # if type == "default":
-        #     content_sql = Zipper().unzip_content(Config().default_data["default_postgres_creates"]+"Tables.zip","sql")
-        #     postgres.run_query(content_sql, "Creating default tables...")
-        # else:
-        #     print("Enter the table creation query: \nExample: CREATE TABLE tablename ( columnname1 SERIAL PRIMARY KEY, columenname2 VARCHAR(50), columnname3 VARCHAR(50) )\n");
-        #     query = input()
-        #     query = query.lower()
-        #     if query.startswith("create table"):
-        #         postgres.run_query(query, "Creating a new custom table...")
-        #     else:
-        #         print("\nThe query must begin with CREATE TABLE")
-        #         print("\nPress enter to go back to the menu")
-        #         input()
