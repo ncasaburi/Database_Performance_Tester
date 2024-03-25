@@ -21,7 +21,6 @@ class PostgreSQL():
 
         try:
             if hasattr(self, 'cursor') and self.cursor:
-                #return "hospital (PostgreSQL)"
                 return self.cursor.connection.get_dsn_parameters()["dbname"]
             else:
                 return "Disconnected"

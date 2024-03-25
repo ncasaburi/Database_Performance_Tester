@@ -32,7 +32,7 @@ class MongoDB():
         return cls._instance
     
     def __init__(self):
-        """This function initialize the PostgreSQL class"""
+        """This function initialize the MongoDB class"""
             
         pass
     
@@ -63,6 +63,42 @@ class MongoDB():
             SingleLogger().logger.exception("Error while getting MongoDB connection status", exc_info=True)
             sys.exit(1)
 
+    def exist(self, db_connection_string, db_name):
+        """This function checks whether the database exists or not"""
+
+        try:
+            SingleLogger().logger.info("Checking whether database "+db_name+" exist or not...")
+            self.connect(db_connection_string, "")
+            list_databases = self.conn.list_database_names()
+            if db_name in list_databases:   
+                SingleLogger().logger.info("Database "+db_name+" already exists")
+                return True
+            else:
+                SingleLogger().logger.info("Database "+db_name+" doesn't exists")
+                return False   
+        except Exception:
+            SingleLogger().logger.exception("Error while checking MongoDB database existence", exc_info=True)
+            sys.exit(1)            
+
+    def create(self, db_connection_string, db_name):
+        """This function creates a database on MongoDB"""
+
+        try:
+            SingleLogger().logger.info("Creating database "+db_name+" on MongoDB...")
+
+            if not self.exist(db_connection_string, db_name):
+                start_counter = time.time()
+                self.db = self.conn[db_name]
+                stop_counter = time.time()
+                SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
+                SingleLogger().logger.info("Database "+db_name+" created")
+                self.connect(db_connection_string,db_name)
+        except Exception:
+            SingleLogger().logger.exception("Error while connecting to MongoDB", exc_info=True)
+            sys.exit(1)
+
+
+
     def connect(self, db_connection_string, db_name):
         try:
             SingleLogger().logger.info("Connecting to "+db_connection_string+db_name+" on MongoDB...")
@@ -73,7 +109,7 @@ class MongoDB():
             SingleLogger().logger.info("Connection with "+db_connection_string+db_name+" has been established")
             self.__connection_string = db_connection_string
         except Exception as error:
-            SingleLogger().logger.exception("Error while connecting to "+db_connection_string+db_name+" on PostgreSQL", exc_info=True)
+            SingleLogger().logger.exception("Error while connecting to "+db_connection_string+db_name+" on MongoDB", exc_info=True)
             sys.exit(1)
 
 
@@ -122,6 +158,34 @@ class MongoDB():
             col.insert_many(document)
         return
     
+    def drop(self, db_connection_string, db_name):
+        """This function drops a MongoDB database"""
+        
+        try:
+            SingleLogger().logger.info("Dropping the database "+db_name+" from MongoDB...")
+            if self.exist(db_connection_string, db_name):
+                start_counter = time.time()
+                # self.cursor.execute('DROP DATABASE IF EXISTS '+db_name)
+                self.conn.drop_database(db_name)
+                stop_counter = time.time()
+                SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
+                SingleLogger().logger.info("The database "+db_name+" has been dropped")
+            self.close()
+        except Exception:
+            SingleLogger().logger.exception("Error while dropping database on MongoDB", exc_info=True)
+            sys.exit(1)
+
+    def close(self):
+        """This function closes the cursor and connection"""
+
+        try:
+            if hasattr(self, 'conn'):
+                self.conn.close()
+            self.__connection_string = None
+            SingleLogger().logger.info("Connection closed\n")
+        except Exception:
+            SingleLogger().logger.exception("Error while closing MongoDB cursor and connection", exc_info=True)
+            sys.exit(1)
 
     @property
     def connection_string(self):
