@@ -9,7 +9,8 @@ import os
 
 def main():
     """Start the application"""
-
+    # Initializing logger
+    SingleLogger().logger = CustomLogger(name=Config().default_logs["default_log_name"], log_dir=Config().default_logs["default_log_path"]+os.path.sep+str(datetime.datetime.now().strftime(Config().default_logs["default_log_time_format"]))+'.log')
     mongo = MongoDB()
 
     postgres = PostgreSQL()

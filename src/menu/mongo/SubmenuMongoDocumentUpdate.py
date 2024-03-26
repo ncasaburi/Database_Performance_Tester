@@ -24,7 +24,7 @@ class SubmenuMongoDocumentUpdate():
     def get(self) -> ConsoleMenu:
         return self.submenu_mongo_document_update
 
-    def postgres_row_update_fn(self, type:str):
+    def mongo_document_update_fn(self, type:str):
         """This function allows the user to update rows into a PostgreSQL database"""       
         
         try:
@@ -41,10 +41,16 @@ class SubmenuMongoDocumentUpdate():
                         input("Press enter to continue")
                         documents_to_update = documents_left
 
+                id_minimo = str(1)
+                id_maximo = str(documents_to_update)
+
+                # Realizar la actualización
+                result = collection.update_many({"id_patient": {"$gte": id_minimo, "$lte": id_maximo}},
+                                     {"$set": {"name": "Roberts"}})
+                print("Total documents updated:", result.modified_count)
 
 
                 # postgres.run_query("UPDATE medical_records SET discharge_date = '"+datetime.now().strftime('%Y-%m-%d')+"' WHERE id_medical_record IN ( SELECT id_medical_record FROM medical_records ORDER BY id_medical_record DESC LIMIT "+str(rows_to_update)+")","Updating "+str(rows_to_update)+" medical records...")
-                # postgres.run_query("UPDATE patients SET name = 'Robert' WHERE id_patient IN ( SELECT id_patient FROM patients ORDER BY id_patient DESC LIMIT "+str(rows_to_update)+" )", "Updating "+str(rows_to_update)+" patients...")
                 # postgres.run_query("UPDATE doctors SET name = 'Mark' WHERE id_doctor IN ( SELECT id_doctor FROM doctors ORDER BY id_doctor DESC LIMIT "+str(rows_to_update)+" )", "Updating "+str(rows_to_update)+" doctors...")
 
             else:
