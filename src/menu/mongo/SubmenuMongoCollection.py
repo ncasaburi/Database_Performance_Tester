@@ -32,9 +32,7 @@ class SubmenuMongoCollection():
     def mongo_collection_list_fn(self):
         """This function lists the collections"""
 
-        mongo = MongoDB()
-        mongo.connect(Config().default_dbs["default_mongo_connection_string"],Config().default_dbs["default_database_name"])
-        collections = mongo.list_collections()
+        collections = MongoDB().db.list_collection_names()
         print("Collections:\n")
         if collections == None:
             print("No Collections found")

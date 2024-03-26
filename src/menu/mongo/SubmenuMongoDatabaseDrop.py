@@ -30,16 +30,14 @@ class SubmenuMongoDatabaseDrop():
         """This function allows the user to drop a MongoDB database"""
 
         try:
-            mongo = MongoDB()
             if type == "default":
-                mongo.drop(Config().default_dbs["default_mongo_connection_string"],Config().default_dbs["default_database_name"])
+                MongoDB().drop(Config().default_dbs["default_database_name"])
             elif type == "current":
-                mongo.drop(mongo.connection_string,mongo.status())
+                MongoDB().drop(MongoDB().status())
             else:
                 print("Enter the connection string: (example: mongodb://user:password@localhost:27017/)")
-                postgre_connection_string = input()
                 print("Enter the database name:")
                 db_name = input()
-                mongo.drop(postgre_connection_string,db_name)
+                MongoDB().drop(db_name)
         except:
             SingleLogger().logger.exception("Error while dropping a MongoDB database", exc_info=True)

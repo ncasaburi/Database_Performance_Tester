@@ -35,27 +35,15 @@ class SubmenuMongoDatabase():
         """This function allows the user to see all available MongoDB databases"""
 
         try:
-            mongo = MongoDB()
-            mongo.connect(Config().default_dbs["default_mongo_connection_string"],"")
-            list_databases = mongo.conn.list_database_names()
+            if MongoDB().status() == "Disconnected":
+                print("Database disconnected")
+            else:
+                list_databases = MongoDB().client.list_database_names()
             print("Databases:\n")
             for db in list_databases:
                 print(" - "+db)
                 print("\nPress enter to continue...")
                 input()
-
-            # db_list = mongo.run_query("SELECT datname FROM pg_database","Listing all available Mongo databases", True)
-            # if db_list == None:
-            #     print("No databases found\n")
-            #     print("Press enter to continue")
-            #     input()
-            #     return
-            # else:
-            #     print("Databases:\n")
-            #     for db in db_list:
-            #         print(" - "+db[0])
-            #     print("\nPress enter to continue...")
-            #     input()
         except:
             SingleLogger().logger.exception("Error while listing available MongoDB databases", exc_info=True)
 

@@ -27,14 +27,16 @@ class SubmenuMongoCollectionDrop():
     def mongo_collection_drop_fn(self, type:str):
         """This function allows the user to drop a collection"""
 
-        mongo = MongoDB()
-        mongo.connect(Config().default_dbs["default_mongo_connection_string"],Config().default_dbs["default_database_name"])
         if type == "default":
-            mongo.drop_collection('doctor_medical_records')
-            mongo.drop_collection('patients')
-            mongo.drop_collection('doctors')
-            mongo.drop_collection('medical_records')
+            if MongoDB().exist_collection('doctor_medical_records'):
+                MongoDB().drop_collection('doctor_medical_records')
+            if MongoDB().exist_collection('patients'):
+                MongoDB().drop_collection('patients')
+            if MongoDB().exist_collection('doctors'):
+                MongoDB().drop_collection('doctors')
+            if MongoDB().exist_collection('medical_records'):
+                MongoDB().drop_collection('medical_records')
         else:
             print("Enter your name collection to drop:\n")
             collectionname = input()            
-            mongo.drop_collection(collectionname)
+            MongoDB().drop_collection(collectionname)
