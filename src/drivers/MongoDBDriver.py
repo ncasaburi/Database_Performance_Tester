@@ -81,9 +81,12 @@ class MongoDB():
             SingleLogger().logger.exception("Error while connecting to "+db_connection_string+db_name+" on MongoDB", exc_info=True)
             sys.exit(1)
 
-    def execute_query(self, query):
+    def execute_query_update(self, collection_default, query_update, update):
         try:
-            result = self.db.eval(query)
+            collection = MongoDB().db[collection_default]
+            SingleLogger().logger.info("Updating collection: "+collection_default)
+            result = collection.update_many(query_update,update)
+            SingleLogger().logger.info("Total documents updated: " + str(result.modified_count))
             SingleLogger().logger.info("Query executed successfully.")
             return result
         except Exception as error:

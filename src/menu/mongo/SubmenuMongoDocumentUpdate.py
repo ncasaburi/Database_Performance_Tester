@@ -43,12 +43,23 @@ class SubmenuMongoDocumentUpdate():
 
                 id_minimo = str(1)
                 id_maximo = str(documents_to_update)
+                query_update = {"id_patient": {"$gte": id_minimo, "$lte": id_maximo}}
+                update = {"$set": {"name": "Roberts"}}
+                MongoDB().execute_query_update('patients',query_update,update)
+                query_update = {"id_doctor": {"$gte": id_minimo, "$lte": id_maximo}}
+                update = {"$set": {"name": "Mark"}}
+                MongoDB().execute_query_update('doctors',query_update,update)
+                  
+                # # Realizar la actualización
+                # result = collection.update_many({"id_patient": {"$gte": id_minimo, "$lte": id_maximo}},
+                #                      {"$set": {"name": "Roberts"}})
+                #print("Total documents updated:", result.modified_count)
 
-                # Realizar la actualización
-                result = collection.update_many({"id_patient": {"$gte": id_minimo, "$lte": id_maximo}},
-                                     {"$set": {"name": "Roberts"}})
-                print("Total documents updated:", result.modified_count)
-
+                # collection_default = 'doctors'
+                # collection = MongoDB().db[collection_default]
+                # result = collection.update_many({"id_doctor": {"$gte": id_minimo, "$lte": id_maximo}},
+                #                      {"$set": {"name": "Mark"}})
+                # print("Total documents updated:", result.modified_count)
 
                 # postgres.run_query("UPDATE medical_records SET discharge_date = '"+datetime.now().strftime('%Y-%m-%d')+"' WHERE id_medical_record IN ( SELECT id_medical_record FROM medical_records ORDER BY id_medical_record DESC LIMIT "+str(rows_to_update)+")","Updating "+str(rows_to_update)+" medical records...")
                 # postgres.run_query("UPDATE doctors SET name = 'Mark' WHERE id_doctor IN ( SELECT id_doctor FROM doctors ORDER BY id_doctor DESC LIMIT "+str(rows_to_update)+" )", "Updating "+str(rows_to_update)+" doctors...")
