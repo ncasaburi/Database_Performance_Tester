@@ -21,4 +21,4 @@ def status() -> str:
     else:
         status_Mongo = color(db_status_MongoDB, fg="green")    
 
-    return "Databases "+"PostgreSQL->"+status_PostgreSQL+"-MongoDB->"+status_Mongo+"\nCurrent log: "+color(current_log, fg="green")
+    return "Databases"+"\n - PostgreSQL: "+status_PostgreSQL+"\n - MongoDB: "+status_Mongo+"\nCurrent log: "+color(current_log, fg="green")
