@@ -8,11 +8,11 @@ import time
 
 class DataGenerator():
 
-    def __init__(self, default_row_set:int=10000, default_insert_files:int=10, SQL_enable:bool=True, MQL_enable:bool=True) -> None:
+    def __init__(self, default_insert_set:int=10000, default_insert_files:int=10, SQL_enable:bool=True, MQL_enable:bool=True) -> None:
         """This function initializes the DataGenerator class"""
 
         try:
-            self._default_row_set = default_row_set
+            self._default_insert_set = default_insert_set
             self._default_insert_files = default_insert_files
 
             self._SQL_enable = SQL_enable
@@ -77,15 +77,15 @@ class DataGenerator():
 
         try:
             sets = lambda: "sets" if self.default_insert_files > 1 else "set"
-            SingleLogger().logger.info(f"Generating data with {int(self.default_row_set*self.default_insert_files)} patients and splitting them into {self.default_insert_files}...")
+            SingleLogger().logger.info(f"Generating data with {int(self.default_insert_set*self.default_insert_files)} patients and splitting them into {self.default_insert_files}...")
             start_counter = time.time()
-            for i1 in tqdm(range(self.default_insert_files), desc="Generating "+str(self.default_insert_files)+" "+sets()+" of "+str(self.default_row_set)+" patients", ascii=' #'):
+            for i1 in tqdm(range(self.default_insert_files), desc="Generating "+str(self.default_insert_files)+" "+sets()+" of "+str(self.default_insert_set)+" patients", ascii=' #'):
 
                 patients = []
                 patients_sql = []
                 patients_mql = []
-                for i2 in tqdm(range(self.default_row_set), desc="  Creating "+str(self.default_row_set)+" patients", ascii=' #', leave=False):
-                    patient = self._create_patient(i2 + 1 + (i1 * self.default_row_set))
+                for i2 in tqdm(range(self.default_insert_set), desc="  Creating "+str(self.default_insert_set)+" patients", ascii=' #', leave=False):
+                    patient = self._create_patient(i2 + 1 + (i1 * self.default_insert_set))
                     patients.append(patient)
                     if self.SQL_enable:
                         patients_sql.append(f"INSERT INTO patients (id_patient, name, surname, birthday, gender, address, city, state, phone) VALUES ('{patient['id_patient']}','{patient['name']}', '{patient['surname']}', '{patient['birthday']}', '{patient['gender']}', '{patient['address']}', '{patient['city']}', '{patient['state']}', '{patient['phone']}');")
@@ -94,8 +94,8 @@ class DataGenerator():
 
                 # Creating zip files for patients
                 
-                Zipper().zip_content(f"{self._postgres_patients_path}{self.default_row_set}_patients_set{i1}", '\n'.join(map(str, patients_sql)),"sql")
-                Zipper().zip_content(f"{self._mongo_patients_path}{self.default_row_set}_patients_set{i1}", "db.patients.insertMany([\n"+',\n'.join(map(str, patients_mql))+"\n])","js")
+                Zipper().zip_content(f"{self._postgres_patients_path}{self.default_insert_set}_patients_set{i1}", '\n'.join(map(str, patients_sql)),"sql")
+                Zipper().zip_content(f"{self._mongo_patients_path}{self.default_insert_set}_patients_set{i1}", "db.patients.insertMany(["+',\n'.join(map(str, patients_mql))+"\n])","js")
             
             stop_counter = time.time()
             SingleLogger().logger.info(f"Done! Elapsed time: {stop_counter - start_counter} seconds")
@@ -113,15 +113,15 @@ class DataGenerator():
 
         try:
             sets = lambda: "sets" if self.default_insert_files > 1 else "set"
-            SingleLogger().logger.info(f"Generating data with {int(self.default_row_set*self.default_insert_files)} doctors and splitting them into {self.default_insert_files}...")
+            SingleLogger().logger.info(f"Generating data with {int(self.default_insert_set*self.default_insert_files)} doctors and splitting them into {self.default_insert_files}...")
             start_counter = time.time()                                                                 
-            for i1 in tqdm(range(self.default_insert_files), desc="Generating "+str(self.default_insert_files)+" "+sets()+" of "+str(self.default_row_set)+" doctors", ascii=' #'):
+            for i1 in tqdm(range(self.default_insert_files), desc="Generating "+str(self.default_insert_files)+" "+sets()+" of "+str(self.default_insert_set)+" doctors", ascii=' #'):
         
                 doctors = []
                 doctors_sql = []
                 doctors_mql = []
-                for i2 in tqdm(range(self.default_row_set), desc="  Generating "+str(self.default_row_set)+" doctors", ascii=' #', leave=False):
-                    doctor = self._create_doctor(i2 + 1 + (i1 * self.default_row_set))
+                for i2 in tqdm(range(self.default_insert_set), desc="  Generating "+str(self.default_insert_set)+" doctors", ascii=' #', leave=False):
+                    doctor = self._create_doctor(i2 + 1 + (i1 * self.default_insert_set))
                     doctors.append(doctor)
                     if self.SQL_enable:
                         doctors_sql.append(f"INSERT INTO doctors (id_doctor, name, surname, profession) VALUES ('{doctor['id_doctor']}','{doctor['name']}', '{doctor['surname']}', '{doctor['profession']}');")
@@ -130,8 +130,8 @@ class DataGenerator():
 
                 # Creating zip files for doctors
 
-                Zipper().zip_content(f"{self._postgres_doctors_path}{self.default_row_set}_doctors_set{i1}", '\n'.join(map(str, doctors_sql)),"sql")
-                Zipper().zip_content(f"{self._mongo_doctors_path}{self.default_row_set}_doctors_set{i1}", "db.doctors.insertMany([\n"+',\n'.join(map(str, doctors_mql))+"\n])","js")
+                Zipper().zip_content(f"{self._postgres_doctors_path}{self.default_insert_set}_doctors_set{i1}", '\n'.join(map(str, doctors_sql)),"sql")
+                Zipper().zip_content(f"{self._mongo_doctors_path}{self.default_insert_set}_doctors_set{i1}", "db.doctors.insertMany(["+',\n'.join(map(str, doctors_mql))+"\n])","js")
             
             stop_counter = time.time()
             SingleLogger().logger.info(f"Done! Elapsed time: {stop_counter - start_counter} seconds")
@@ -149,33 +149,33 @@ class DataGenerator():
 
         try:
             sets = lambda: "sets" if self.default_insert_files > 1 else "set"
-            SingleLogger().logger.info(f"Generating data with {int(self.default_row_set*self.default_insert_files)} doctors and splitting them into {self.default_insert_files}...")
+            SingleLogger().logger.info(f"Generating data with {int(self.default_insert_set*self.default_insert_files)} doctors and splitting them into {self.default_insert_files}...")
             start_counter = time.time()                                                                 
-            for i1 in tqdm(range(self.default_insert_files), desc="Generating "+str(self.default_insert_files)+" "+sets()+" of "+str(self.default_row_set)+" doctor medical records", ascii=' #'):
+            for i1 in tqdm(range(self.default_insert_files), desc="Generating "+str(self.default_insert_files)+" "+sets()+" of "+str(self.default_insert_set)+" doctor medical records", ascii=' #'):
 
                 medicalrecords = []
                 medicalrecords_sql = []
                 medicalrecords_mql = []
                 doctor_medicalrecords_sql = []
                 doctor_medicalrecords_mql = []
-                for i2 in tqdm(range(self.default_row_set), desc="  Generating "+str(self.default_row_set)+" medical records", ascii=' #', leave=False):
-                    record = self._create_medical_record(i2 + 1 + (i1 * self.default_row_set))
-                    record_dmr = f"INSERT INTO doctor_medical_records (id_doctor, id_medical_record) VALUES ('{i2 + 1 + (i1 * self.default_row_set)}','{record['id_medical_record']}');"
+                for i2 in tqdm(range(self.default_insert_set), desc="  Generating "+str(self.default_insert_set)+" medical records", ascii=' #', leave=False):
+                    record = self._create_medical_record(i2 + 1 + (i1 * self.default_insert_set))
+                    record_dmr = f"INSERT INTO doctor_medical_records (id_doctor, id_medical_record) VALUES ('{i2 + 1 + (i1 * self.default_insert_set)}','{record['id_medical_record']}');"
                     doctor_medicalrecords_sql.append(record_dmr)
-                    doctor_medicalrecords_mql.append(f"{{id_doctor: {i2 + 1 + (i1 * self.default_row_set)}, id_medicalrecord: {i2 + 1 + (i1 * self.default_row_set)}}}")
+                    doctor_medicalrecords_mql.append(f"{{'id_doctor': {i2 + 1 + (i1 * self.default_insert_set)}, 'id_medicalrecord': {i2 + 1 + (i1 * self.default_insert_set)}}}")
                     medicalrecords.append(record)
                     medicalrecords_sql.append(f"INSERT INTO medical_records (id_medical_record, id_patient, admission_date, discharge_date, diagnosis, treatment, test_results) VALUES ({record['id_medical_record']}, {record['id_patient']},'{record['admission_date']}', '{record['discharge_date']}', '{record['diagnosis']}', '{record['treatment']}', '{record['test_result']}');")
                     medicalrecords_mql.append({key: value if key != 'admission_date' and key != 'discharge_date' else value.strftime('%Y-%m-%d') for key, value in record.items()})
 
                 # Creating zip files for medical records
                     
-                Zipper().zip_content(f"{self._postgres_medicalrecords_path}{self.default_row_set}_medicalrecords_set{i1}", '\n'.join(map(str, medicalrecords_sql)),"sql")
-                Zipper().zip_content(f"{self._mongo_medicalrecords_path}{self.default_row_set}_medicalrecords_set{i1}", "db.medical_records.insertMany([\n"+',\n'.join(map(str, medicalrecords_mql))+"\n])","js")
+                Zipper().zip_content(f"{self._postgres_medicalrecords_path}{self.default_insert_set}_medicalrecords_set{i1}", '\n'.join(map(str, medicalrecords_sql)),"sql")
+                Zipper().zip_content(f"{self._mongo_medicalrecords_path}{self.default_insert_set}_medicalrecords_set{i1}", "db.medical_records.insertMany(["+',\n'.join(map(str, medicalrecords_mql))+"\n])","js")
 
                 # Creating zip files for doctor medical records
 
-                Zipper().zip_content(f"{self._postgres_doctor_medicalrecords_path}{self.default_row_set}_doctor_medicalrecords_set{i1}", '\n'.join(map(str, doctor_medicalrecords_sql)),"sql")
-                Zipper().zip_content(f"{self._mongo_doctor_medicalrecords_path}{self.default_row_set}_doctor_medicalrecords_set{i1}", "db.doctor_medical_records.insertMany([\n"+',\n'.join(map(str, doctor_medicalrecords_mql))+"\n])","js")
+                Zipper().zip_content(f"{self._postgres_doctor_medicalrecords_path}{self.default_insert_set}_doctor_medicalrecords_set{i1}", '\n'.join(map(str, doctor_medicalrecords_sql)),"sql")
+                Zipper().zip_content(f"{self._mongo_doctor_medicalrecords_path}{self.default_insert_set}_doctor_medicalrecords_set{i1}", "db.doctor_medical_records.insertMany(["+',\n'.join(map(str, doctor_medicalrecords_mql))+"\n])","js")
             
             stop_counter = time.time()
             SingleLogger().logger.info(f"Done! Elapsed time: {stop_counter - start_counter} seconds")
@@ -209,12 +209,12 @@ class DataGenerator():
         self.MQL_enable = value
 
     @property
-    def default_row_set(self) -> int:
-        return self._default_row_set
+    def default_insert_set(self) -> int:
+        return self._default_insert_set
     
-    @default_row_set.setter
-    def default_row_set(self, value:int):
-        self._default_row_set = value
+    @default_insert_set.setter
+    def default_insert_set(self, value:int):
+        self._default_insert_set = value
         
     @property
     def default_insert_files(self) -> int:
