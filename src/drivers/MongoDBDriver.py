@@ -4,6 +4,7 @@ import sys
 import time
 import zipfile
 import os
+import json
 
 class MongoDB():
     _instance = None
@@ -67,6 +68,8 @@ class MongoDB():
 
 
     def connect(self, db_connection_string, db_name):
+        """This function establishes a connection with a MongoDB database"""
+
         try:
             SingleLogger().logger.info("Connecting to "+db_connection_string+db_name+" on MongoDB...")
             start_counter = time.time()
@@ -82,74 +85,65 @@ class MongoDB():
             sys.exit(1)
 
     def execute_query_update(self, collection_default, query_update, update):
+        """This function updates documents on a MongoDB collection"""
+
         try:
             collection = MongoDB().db[collection_default]
-            SingleLogger().logger.info("Updating collection: "+collection_default)
+            SingleLogger().logger.info("Updating collection "+collection_default+" on MongoDB...")
+            start_counter = time.time()
             result = collection.update_many(query_update,update)
+            stop_counter = time.time()
             SingleLogger().logger.info("Total documents updated: " + str(result.modified_count))
             SingleLogger().logger.info("Query executed successfully.")
             return result
         except Exception as error:
-            SingleLogger().logger.exception("Error while executing query", exc_info=True)
+            SingleLogger().logger.exception("Error while updating documents on MongoBD", exc_info=True)
             return None
         
     def execute_query_delete(self, collection_default, query_delete):
+        """This function deletes documents from a MongoDB collection"""
+
         try:
             collection = MongoDB().db[collection_default]
-            SingleLogger().logger.info("Deleting collection: "+collection_default)
+            SingleLogger().logger.info("Deleting collection: "+collection_default+" on MongoDB...")
+            start_counter = time.time()
             result = collection.delete_many(query_delete)
+            stop_counter = time.time()
             SingleLogger().logger.info("Total documents deleted: " + str(result.deleted_count))
             SingleLogger().logger.info("Query executed successfully.")
             return result
         except Exception as error:
-            SingleLogger().logger.exception("Error while executing query", exc_info=True)
+            SingleLogger().logger.exception("Error while deleting documents on MongoDB", exc_info=True)
             return None
-
-    def execute_operations_from_file(self, logger ,path, description):
-        """Execute MongoDB operations from a file"""
-       
-        try:
-            if not description == "":
-                logger.info(description)
-            with zipfile.ZipFile(path+'.zip', 'r') as zip_ref:
-                file_path = os.path.basename(path+'.js')
-                with zip_ref.open(file_path, 'r') as file:
-                    start_counter = time.time()
-                    for line in file:
-                        line = line.decode()
-                        self.execute_operation(line)
-                    stop_counter = time.time()
-                    logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
-        except Exception:
-            logger.exception("Error while running query from a file to MongoDB", exc_info=True)
-            sys.exit(1)       
-       
-
-    def execute_operation(self,operation_str):
-
-        # drop spaces
-        operation_str = operation_str.strip()
-        # split string
-        parts = operation_str.split('.')
-        # get collection
-        collection_name = parts[1]
-        # get method
-        method = parts[2].split('(')[0]
-        # get document
-        document_str = ''.join(operation_str.split('(')[1:]).strip(')')
-        document = eval(document_str)
-
-        #print("Colección:", collection_name)
-        #print("Método:", method)
-        #print("Documento:", document)
-
-        col = self.db[collection_name]
-        if method == "insertOne":
-            col.insert_one(document)
-        if method == "insertMany":
-            col.insert_many(document)
-        return
     
+    def execute_query_insert(self, collection_default:str, query_insert:str):
+        """This function inserts documents into a MongoDB collection"""
+
+        try:
+            SingleLogger().logger.info("Inserting collection: "+collection_default+" on MongoDB...")
+            collection = self.db[collection_default]
+            documents = json.loads(query_insert)
+            start_counter = time.time()
+            result = collection.insert_many(documents)
+            stop_counter = time.time()
+            SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
+            SingleLogger().logger.info("Total documents inserted: " + str(len(result.inserted_ids)))
+            return result
+        except Exception as error:
+            SingleLogger().logger.exception("Error while inserting documents on MongoDB", exc_info=True)
+            sys.exit(1)
+        
+    def count_documents(self, collection_default:str, filter={}):
+        """This function counts the number of documents from a MongoDB collection"""
+
+        try:
+            collection = self.db[collection_default]
+            result = collection.count_documents(filter)
+            return result
+        except Exception as error:
+            SingleLogger().logger.exception("Error while counting documents on MongoDB", exc_info=True)
+            sys.exit(1)
+
     def drop(self, db_name):
         """This function drops a MongoDB database"""
         
