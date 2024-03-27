@@ -3,8 +3,10 @@ import configparser
 class Config():
     _instance = None
     _config = None
-    _default_lines_read = 0
-    _default_last_file_read = 0
+    _default_postgres_lines_read = 0
+    _default_postgres_last_file_read = 0
+    _default_mongo_lines_read = 0
+    _default_mongo_last_file_read = 0
 
     def __new__(cls):
 
@@ -39,17 +41,33 @@ class Config():
         return self.read_section("Memory")
 
     @property
-    def default_lines_read(self):
-        return self._default_lines_read
+    def default_postgres_lines_read(self):
+        return self._default_postgres_lines_read
     
-    @default_lines_read.setter
-    def default_lines_read(self, value):
-        self._default_lines_read = value
+    @default_postgres_lines_read.setter
+    def default_postgres_lines_read(self, value):
+        self._default_postgres_lines_read = value
 
     @property
-    def default_last_file_read(self):
-        return self._default_last_file_read
+    def default_postgres_last_file_read(self):
+        return self._default_postgres_last_file_read
     
-    @default_last_file_read.setter
-    def default_last_file_read(self, value):
-        self._default_last_file_read = value
+    @default_postgres_last_file_read.setter
+    def default_postgres_last_file_read(self, value):
+        self._default_postgres_last_file_read = value
+
+    @property
+    def default_mongo_lines_read(self):
+        return self._default_mongo_lines_read
+    
+    @default_mongo_lines_read.setter
+    def default_mongo_lines_read(self, value):
+        self._default_mongo_lines_read = value
+
+    @property
+    def default_mongo_last_file_read(self):
+        return self._default_mongo_last_file_read
+    
+    @default_mongo_last_file_read.setter
+    def default_mongo_last_file_read(self, value):
+        self._default_mongo_last_file_read = value
