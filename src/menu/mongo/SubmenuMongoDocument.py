@@ -11,12 +11,12 @@ class SubmenuMongoDocument():
         """This function initializes the SubmenuPostgresRow class"""
         
         #submenu definition
-        self.submenu_mongo_document = ConsoleMenu("PostgreSQL Row Operations", status)
+        self.submenu_mongo_document = ConsoleMenu("MongoDB Document Operations", status)
         
         #submenu items
-        mongo_document_insert = SubmenuItem("Insert rows", SubmenuMongoDocumentInsert().get(), self.submenu_mongo_document)
-        mongo_document_update = SubmenuItem("Update rows", SubmenuMongoDocumentUpdate().get(), self.submenu_mongo_document)
-        mongo_document_delete = SubmenuItem("Delete rows", SubmenuMongoDocumentDelete().get(), self.submenu_mongo_document)
+        mongo_document_insert = SubmenuItem("Insert documents", SubmenuMongoDocumentInsert().get(), self.submenu_mongo_document)
+        mongo_document_update = SubmenuItem("Update documents", SubmenuMongoDocumentUpdate().get(), self.submenu_mongo_document)
+        mongo_document_delete = SubmenuItem("Delete documents", SubmenuMongoDocumentDelete().get(), self.submenu_mongo_document)
 
         #submenu appends
         self.submenu_mongo_document.append_item(mongo_document_insert)

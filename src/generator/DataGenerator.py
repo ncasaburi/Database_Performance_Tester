@@ -35,7 +35,8 @@ class DataGenerator():
         """This function creates a patient with all their data"""
 
         return {
-            'id_patient': str(id),
+            # 'id_patient': str(id),
+            'id_patient': id,
             'name': self.custom_facker.first_name(),
             'surname': self.custom_facker.last_name(),
             'birthday': self.custom_facker.date_of_birth(minimum_age=18, maximum_age=98),
@@ -50,7 +51,8 @@ class DataGenerator():
         """This function creates a medical record with all its data"""
 
         return {
-            'id_medical_record': str(id),
+            # 'id_medical_record': str(id),
+            'id_medical_record': id,
             'id_patient': str(id),
             'admission_date': self.custom_facker.date_between(start_date='-5y', end_date='today'),
             'discharge_date': self.custom_facker.date_between(start_date='-5y', end_date='today'),
@@ -63,7 +65,8 @@ class DataGenerator():
         """This function creates a doctor with all their data"""
 
         return {
-            'id_doctor': str(id),
+            #'id_doctor': str(id),
+            'id_doctor': id,
             'name': self.custom_facker.first_name(),
             'surname': self.custom_facker.last_name(),
             'profession': self.custom_facker.profession(),

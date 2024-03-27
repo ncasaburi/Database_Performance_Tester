@@ -1,58 +1,79 @@
 from consolemenu import *
 from consolemenu.items import *
 from src.menu.status import status
-from src.drivers.PostgreSQLDriver import PostgreSQL
+from src.drivers.MongoDBDriver import MongoDB
 from src.logger.SingleLogger import SingleLogger
 
 class SubmenuMongoDocumentDelete():
 
     def __init__(self) -> None:
-        """This function initializes the SubmenuPostgresRowDelete class"""
+        """This function initializes the SubmenuMongoDocumentDelete class"""
         
         #submenu definition
-        self.submenu_postgres_row_delete = ConsoleMenu("PostgreSQL Row Delete", status)
+        self.submenu_mango_document_delete = ConsoleMenu("Mongo Document Delete", status)
         
         #submenu items
-        postgres_row_delete_default = FunctionItem("Delete default rows", self.postgres_row_delete_fn, args=["default"])
-        postgres_row_delete_custom = FunctionItem("Delete custom rows", self.postgres_row_delete_fn, args=["custom"])
+        mango_document_delete_default = FunctionItem("Delete default document", self.mango_document_delete_fn, args=["default"])
+        mango_document_delete_custom = FunctionItem("Delete custom document", self.mango_document_delete_fn, args=["custom"])
 
         #submenu appends
-        self.submenu_postgres_row_delete.append_item(postgres_row_delete_default)
-        self.submenu_postgres_row_delete.append_item(postgres_row_delete_custom)
+        self.submenu_mango_document_delete.append_item(mango_document_delete_default)
+        self.submenu_mango_document_delete.append_item(mango_document_delete_custom)
     
     def get(self) -> ConsoleMenu:
-        return self.submenu_postgres_row_delete
+        return self.submenu_mango_document_delete
     
-    def postgres_row_delete_fn(self, type:str) -> None:
+    def mango_document_delete_fn(self, type:str) -> None:
         """This function allows the user to delete rows ina a table"""
 
         try:
-            postgres = PostgreSQL()
             if type == "default":
-                print("How many rows do you want to delete?: ("+str(postgres.run_query("SELECT COUNT(*) FROM doctors","",expected_result=True)[0][0])+" rows left)")
-                rows_to_delete = input()
-                postgres.run_query("DELETE FROM doctor_medical_records WHERE id_doctor IN ( SELECT id_doctor FROM doctor_medical_records ORDER BY id_medical_record DESC, id_doctor DESC LIMIT "+str(rows_to_delete)+" )","Deleting "+str(rows_to_delete)+" relationships between doctors and medical records...")
-                postgres.run_query("DELETE FROM medical_records WHERE id_medical_record IN ( SELECT id_medical_record FROM medical_records ORDER BY id_patient DESC, id_medical_record DESC LIMIT "+str(rows_to_delete)+" )","Deleting "+str(rows_to_delete)+" medical records...")
-                postgres.run_query("DELETE FROM patients WHERE id_patient IN ( SELECT id_patient FROM patients ORDER BY id_patient DESC LIMIT "+str(rows_to_delete)+" )","Deleting "+str(rows_to_delete)+" patients...")
-                postgres.run_query("DELETE FROM doctors WHERE id_doctor IN ( SELECT id_doctor FROM doctors ORDER BY id_doctor DESC LIMIT "+str(rows_to_delete)+" )","Deleting "+str(rows_to_delete)+" doctors...")
+                collection_default = 'doctor_medical_records'
+                collection = MongoDB().db[collection_default]
+                documents_left = collection.count_documents({})
+                print("How many documents do you want to delete?: ("+str(documents_left)+" documents available)")
+                documents_to_delete = input()
+                if int(documents_to_delete) > documents_left:
+                    print("The number of documents requested exceed the number of documents available.\nAs a result, "+str(documents_left)+" documents will be inserted")
+                    input("Press enter to continue")
+                    documents_to_delete = documents_left
+
+                id_minimo = str(1)
+                id_maximo = str(documents_to_delete)
+                query_delete = {"id_doctor": {"$gte": int(1), "$lte": int(documents_to_delete)}}
+                MongoDB().execute_query_delete('doctor_medical_records',query_delete)
+                query_delete = {"id_doctor": {"$gte": id_minimo, "$lte": id_maximo}}
+                MongoDB().execute_query_delete('doctors',query_delete)
+                query_delete = {"id_patient": {"$gte": id_minimo, "$lte": id_maximo}}
+                MongoDB().execute_query_delete('patients',query_delete)
+                query_delete = {"id_medical_record": {"$gte": id_minimo, "$lte": id_maximo}}
+                MongoDB().execute_query_delete('medical_records',query_delete)
+   
+                # print("How many rows do you want to delete?: ("+str(postgres.run_query("SELECT COUNT(*) FROM doctors","",expected_result=True)[0][0])+" rows left)")
+                # rows_to_delete = input()
+                # postgres.run_query("DELETE FROM doctor_medical_records WHERE id_doctor IN ( SELECT id_doctor FROM doctor_medical_records ORDER BY id_medical_record DESC, id_doctor DESC LIMIT "+str(rows_to_delete)+" )","Deleting "+str(rows_to_delete)+" relationships between doctors and medical records...")
+                # postgres.run_query("DELETE FROM medical_records WHERE id_medical_record IN ( SELECT id_medical_record FROM medical_records ORDER BY id_patient DESC, id_medical_record DESC LIMIT "+str(rows_to_delete)+" )","Deleting "+str(rows_to_delete)+" medical records...")
+                # postgres.run_query("DELETE FROM patients WHERE id_patient IN ( SELECT id_patient FROM patients ORDER BY id_patient DESC LIMIT "+str(rows_to_delete)+" )","Deleting "+str(rows_to_delete)+" patients...")
+                # postgres.run_query("DELETE FROM doctors WHERE id_doctor IN ( SELECT id_doctor FROM doctors ORDER BY id_doctor DESC LIMIT "+str(rows_to_delete)+" )","Deleting "+str(rows_to_delete)+" doctors...")
             else:
-                table_list = postgres.run_query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_catalog = '"+postgres.status()+"';", expected_result=True)
-                print("Tables:\n")
-                for table in table_list:
-                    print(" - "+str(table[0])+" (rows: "+str(postgres.run_query("SELECT COUNT(*) FROM "+str(table[0]),"",expected_result=True)[0][0])+", columns: "+str(postgres.run_query("SELECT COUNT(*) FROM information_schema.columns WHERE table_name = '"+str(table[0])+"';","",expected_result=True)[0][0])+")")
-                    print("   ("+', '.join(item[0] for item in postgres.run_query("SELECT column_name FROM information_schema.columns WHERE table_name = '"+str(table[0])+"'","",expected_result=True))+")")
-                print("")
-                print("Enter your query to delete rows:\n")
-                print("  Example:")
-                print("    DELETE FROM tablename")
-                print("    WHERE condition")
-                tablename = input("\n\n  DELETE FROM ")
-                condition = input("  WHERE ")
-                query = ""
-                if not tablename == "":
-                    query = "DELETE FROM "+tablename
-                if not condition == "":
-                    query = query + " " + "WHERE "+ condition
-                postgres.run_query(query)
+                # table_list = postgres.run_query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_catalog = '"+postgres.status()+"';", expected_result=True)
+                # print("Tables:\n")
+                # for table in table_list:
+                #     print(" - "+str(table[0])+" (rows: "+str(postgres.run_query("SELECT COUNT(*) FROM "+str(table[0]),"",expected_result=True)[0][0])+", columns: "+str(postgres.run_query("SELECT COUNT(*) FROM information_schema.columns WHERE table_name = '"+str(table[0])+"';","",expected_result=True)[0][0])+")")
+                #     print("   ("+', '.join(item[0] for item in postgres.run_query("SELECT column_name FROM information_schema.columns WHERE table_name = '"+str(table[0])+"'","",expected_result=True))+")")
+                # print("")
+                # print("Enter your query to delete rows:\n")
+                # print("  Example:")
+                # print("    DELETE FROM tablename")
+                # print("    WHERE condition")
+                # tablename = input("\n\n  DELETE FROM ")
+                # condition = input("  WHERE ")
+                # query = ""
+                # if not tablename == "":
+                #     query = "DELETE FROM "+tablename
+                # if not condition == "":
+                #     query = query + " " + "WHERE "+ condition
+                # postgres.run_query(query)
+                print("Collection")
         except:
-            SingleLogger().logger.exception("Error while deleting rows to PostgreSQL", exc_info=True)
+            SingleLogger().logger.exception("Error while deleting documents to MongoDB", exc_info=True)

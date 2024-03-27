@@ -49,6 +49,9 @@ class SubmenuMongoDocumentUpdate():
                 query_update = {"id_doctor": {"$gte": id_minimo, "$lte": id_maximo}}
                 update = {"$set": {"name": "Mark"}}
                 MongoDB().execute_query_update('doctors',query_update,update)
+                query_update = {"id_medical_record": {"$gte": id_minimo, "$lte": id_maximo}}
+                update = {"$set": {"discharge_date": datetime.now().strftime('%Y-%m-%d')}}
+                MongoDB().execute_query_update('medical_records',query_update,update)
                   
                 # # Realizar la actualización
                 # result = collection.update_many({"id_patient": {"$gte": id_minimo, "$lte": id_maximo}},

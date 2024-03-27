@@ -92,7 +92,18 @@ class MongoDB():
         except Exception as error:
             SingleLogger().logger.exception("Error while executing query", exc_info=True)
             return None
-
+        
+    def execute_query_delete(self, collection_default, query_delete):
+        try:
+            collection = MongoDB().db[collection_default]
+            SingleLogger().logger.info("Deleting collection: "+collection_default)
+            result = collection.delete_many(query_delete)
+            SingleLogger().logger.info("Total documents deleted: " + str(result.deleted_count))
+            SingleLogger().logger.info("Query executed successfully.")
+            return result
+        except Exception as error:
+            SingleLogger().logger.exception("Error while executing query", exc_info=True)
+            return None
 
     def execute_operations_from_file(self, logger ,path, description):
         """Execute MongoDB operations from a file"""
