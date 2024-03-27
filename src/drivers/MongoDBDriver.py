@@ -85,7 +85,10 @@ class MongoDB():
         try:
             collection = MongoDB().db[collection_default]
             SingleLogger().logger.info("Updating collection: "+collection_default)
+            start_counter = time.time()
             result = collection.update_many(query_update,update)
+            stop_counter = time.time()
+            SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
             SingleLogger().logger.info("Total documents updated: " + str(result.modified_count))
             SingleLogger().logger.info("Query executed successfully.")
             return result
@@ -97,13 +100,47 @@ class MongoDB():
         try:
             collection = MongoDB().db[collection_default]
             SingleLogger().logger.info("Deleting collection: "+collection_default)
+            start_counter = time.time()
             result = collection.delete_many(query_delete)
+            stop_counter = time.time()
+            SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
             SingleLogger().logger.info("Total documents deleted: " + str(result.deleted_count))
             SingleLogger().logger.info("Query executed successfully.")
             return result
         except Exception as error:
             SingleLogger().logger.exception("Error while executing query", exc_info=True)
             return None
+
+    def execute_query_find(self, collection_name, query):
+        try:
+            collection = MongoDB().db[collection_name]
+            SingleLogger().logger.info("Executing find in " + collection_name)
+            start_counter = time.time()
+            result = collection.find(query)
+            stop_counter = time.time()
+            SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
+            documents = list(result)
+            count = collection.count_documents(query)
+            SingleLogger().logger.info("Documents found " + str(count))
+            return documents , count
+        except Exception as error:
+            SingleLogger().logger.exception("Error while executing find query", exc_info=True)
+            return None , None
+
+    def execute_query_insert(self, collection_name, query):
+        try:
+            collection = MongoDB().db[collection_name]
+            SingleLogger().logger.info("Executing inserts in " + collection_name)
+            start_counter = time.time()
+            result = collection.insert_many(query)
+            stop_counter = time.time()
+            SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
+            count = len(result.inserted_ids)
+            SingleLogger().logger.info("Documents insert " + str(count))
+            return result , count
+        except Exception as error:
+            SingleLogger().logger.exception("Error while executing find query", exc_info=True)
+            return None , None
 
     def execute_operations_from_file(self, logger ,path, description):
         """Execute MongoDB operations from a file"""

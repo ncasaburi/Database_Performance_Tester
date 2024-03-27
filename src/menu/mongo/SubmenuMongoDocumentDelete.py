@@ -38,9 +38,9 @@ class SubmenuMongoDocumentDelete():
                     input("Press enter to continue")
                     documents_to_delete = documents_left
 
-                id_minimo = str(1)
-                id_maximo = str(documents_to_delete)
-                query_delete = {"id_doctor": {"$gte": int(1), "$lte": int(documents_to_delete)}}
+                id_minimo = int(1)
+                id_maximo = int(documents_to_delete)
+                query_delete = {"id_doctor": {"$gte": id_minimo, "$lte": id_maximo}}
                 MongoDB().execute_query_delete('doctor_medical_records',query_delete)
                 query_delete = {"id_doctor": {"$gte": id_minimo, "$lte": id_maximo}}
                 MongoDB().execute_query_delete('doctors',query_delete)

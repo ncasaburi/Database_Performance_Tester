@@ -37,12 +37,12 @@ class SubmenuMongoDocumentUpdate():
 
 
                 if int(documents_to_update) > documents_left:
-                        print("The number of documents requested exceed the number of documents available.\nAs a result, "+str(documents_left)+" documents will be inserted")
-                        input("Press enter to continue")
-                        documents_to_update = documents_left
+                    print("The number of documents requested exceed the number of documents available.\nAs a result, "+str(documents_left)+" documents will be inserted")
+                    input("Press enter to continue")
+                    documents_to_update = documents_left
 
-                id_minimo = str(1)
-                id_maximo = str(documents_to_update)
+                id_minimo = int(1)
+                id_maximo = int(documents_to_update)
                 query_update = {"id_patient": {"$gte": id_minimo, "$lte": id_maximo}}
                 update = {"$set": {"name": "Roberts"}}
                 MongoDB().execute_query_update('patients',query_update,update)

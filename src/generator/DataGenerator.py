@@ -95,7 +95,8 @@ class DataGenerator():
                 # Creating zip files for patients
                 
                 Zipper().zip_content(f"{self._postgres_patients_path}{self.default_row_set}_patients_set{i1}", '\n'.join(map(str, patients_sql)),"sql")
-                Zipper().zip_content(f"{self._mongo_patients_path}{self.default_row_set}_patients_set{i1}", "db.patients.insertMany([\n"+',\n'.join(map(str, patients_mql))+"\n])","js")
+                #Zipper().zip_content(f"{self._mongo_patients_path}{self.default_row_set}_patients_set{i1}", "db.patients.insertMany([\n"+',\n'.join(map(str, patients_mql))+"\n])","js")
+                Zipper().zip_content(f"{self._mongo_patients_path}{self.default_row_set}_patients_set{i1}", "db.patients.insertMany(["+',\n'.join(map(str, patients_mql))+"])","js")
             
             stop_counter = time.time()
             SingleLogger().logger.info(f"Done! Elapsed time: {stop_counter - start_counter} seconds")
@@ -131,7 +132,8 @@ class DataGenerator():
                 # Creating zip files for doctors
 
                 Zipper().zip_content(f"{self._postgres_doctors_path}{self.default_row_set}_doctors_set{i1}", '\n'.join(map(str, doctors_sql)),"sql")
-                Zipper().zip_content(f"{self._mongo_doctors_path}{self.default_row_set}_doctors_set{i1}", "db.doctors.insertMany([\n"+',\n'.join(map(str, doctors_mql))+"\n])","js")
+                # Zipper().zip_content(f"{self._mongo_doctors_path}{self.default_row_set}_doctors_set{i1}", "db.doctors.insertMany([\n"+',\n'.join(map(str, doctors_mql))+"\n])","js")
+                Zipper().zip_content(f"{self._mongo_doctors_path}{self.default_row_set}_doctors_set{i1}", "db.doctors.insertMany(["+',\n'.join(map(str, doctors_mql))+"])","js")
             
             stop_counter = time.time()
             SingleLogger().logger.info(f"Done! Elapsed time: {stop_counter - start_counter} seconds")
@@ -162,7 +164,8 @@ class DataGenerator():
                     record = self._create_medical_record(i2 + 1 + (i1 * self.default_row_set))
                     record_dmr = f"INSERT INTO doctor_medical_records (id_doctor, id_medical_record) VALUES ('{i2 + 1 + (i1 * self.default_row_set)}','{record['id_medical_record']}');"
                     doctor_medicalrecords_sql.append(record_dmr)
-                    doctor_medicalrecords_mql.append(f"{{id_doctor: {i2 + 1 + (i1 * self.default_row_set)}, id_medicalrecord: {i2 + 1 + (i1 * self.default_row_set)}}}")
+                    # doctor_medicalrecords_mql.append(f"{{id_doctor: {i2 + 1 + (i1 * self.default_row_set)}, id_medicalrecord: {i2 + 1 + (i1 * self.default_row_set)}}}")
+                    doctor_medicalrecords_mql.append(f"{{'id_doctor': {i2 + 1 + (i1 * self.default_row_set)}, 'id_medicalrecord': {i2 + 1 + (i1 * self.default_row_set)}}}")
                     medicalrecords.append(record)
                     medicalrecords_sql.append(f"INSERT INTO medical_records (id_medical_record, id_patient, admission_date, discharge_date, diagnosis, treatment, test_results) VALUES ({record['id_medical_record']}, {record['id_patient']},'{record['admission_date']}', '{record['discharge_date']}', '{record['diagnosis']}', '{record['treatment']}', '{record['test_result']}');")
                     medicalrecords_mql.append({key: value if key != 'admission_date' and key != 'discharge_date' else value.strftime('%Y-%m-%d') for key, value in record.items()})
@@ -170,12 +173,14 @@ class DataGenerator():
                 # Creating zip files for medical records
                     
                 Zipper().zip_content(f"{self._postgres_medicalrecords_path}{self.default_row_set}_medicalrecords_set{i1}", '\n'.join(map(str, medicalrecords_sql)),"sql")
-                Zipper().zip_content(f"{self._mongo_medicalrecords_path}{self.default_row_set}_medicalrecords_set{i1}", "db.medical_records.insertMany([\n"+',\n'.join(map(str, medicalrecords_mql))+"\n])","js")
+                #Zipper().zip_content(f"{self._mongo_medicalrecords_path}{self.default_row_set}_medicalrecords_set{i1}", "db.medical_records.insertMany([\n"+',\n'.join(map(str, medicalrecords_mql))+"\n])","js")
+                Zipper().zip_content(f"{self._mongo_medicalrecords_path}{self.default_row_set}_medicalrecords_set{i1}", "db.medical_records.insertMany(["+',\n'.join(map(str, medicalrecords_mql))+"])","js")
 
                 # Creating zip files for doctor medical records
 
                 Zipper().zip_content(f"{self._postgres_doctor_medicalrecords_path}{self.default_row_set}_doctor_medicalrecords_set{i1}", '\n'.join(map(str, doctor_medicalrecords_sql)),"sql")
-                Zipper().zip_content(f"{self._mongo_doctor_medicalrecords_path}{self.default_row_set}_doctor_medicalrecords_set{i1}", "db.doctor_medical_records.insertMany([\n"+',\n'.join(map(str, doctor_medicalrecords_mql))+"\n])","js")
+                #Zipper().zip_content(f"{self._mongo_doctor_medicalrecords_path}{self.default_row_set}_doctor_medicalrecords_set{i1}", "db.doctor_medical_records.insertMany([\n"+',\n'.join(map(str, doctor_medicalrecords_mql))+"\n])","js")
+                Zipper().zip_content(f"{self._mongo_doctor_medicalrecords_path}{self.default_row_set}_doctor_medicalrecords_set{i1}", "db.doctor_medical_records.insertMany(["+',\n'.join(map(str, doctor_medicalrecords_mql))+"])","js")
             
             stop_counter = time.time()
             SingleLogger().logger.info(f"Done! Elapsed time: {stop_counter - start_counter} seconds")
