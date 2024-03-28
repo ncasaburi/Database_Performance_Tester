@@ -53,7 +53,7 @@ class DataGenerator():
         return {
             # 'id_medical_record': str(id),
             'id_medical_record': id,
-            'id_patient': str(id),
+            'id_patient': id,
             'admission_date': self.custom_facker.date_between(start_date='-5y', end_date='today'),
             'discharge_date': self.custom_facker.date_between(start_date='-5y', end_date='today'),
             'diagnosis': self.custom_facker.diagnosis(),  

@@ -150,6 +150,34 @@ class MongoDB():
         except Exception as error:
             SingleLogger().logger.exception("Error while inserting documents on MongoDB", exc_info=True)
             sys.exit(1)
+
+    def execute_aggregate(self, collection_default,pipeline):
+        """This function execute aggregate on documents into a MongoDB collection"""
+        try:
+            SingleLogger().logger.info("Executing aggregate collection: "+collection_default+" on MongoDB...")
+            collection = self.db[collection_default]
+            start_counter = time.time()
+            result = collection.aggregate(pipeline)
+            stop_counter = time.time()
+            SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
+            return list(result)
+        except Exception as error:
+            SingleLogger().logger.exception("Error while execute aggregate on documents", exc_info=True)
+            sys.exit(1)
+    
+    def create_index(self, collection_default, index):
+        """This function create index on default collection into a database MongoDB"""    
+        try:
+            SingleLogger().logger.info("Creating indexes on collections: "+collection_default+" on MongoDB...")
+            collection = self.db[collection_default]
+            start_counter = time.time()
+            collection.create_index(index)
+            stop_counter = time.time()
+            SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
+        except Exception as error:
+            SingleLogger().logger.exception("Error while creating index on document", exc_info=True)
+            sys.exit(1)
+
         
     def count_documents(self, collection_default:str, filter={}):
         """This function counts the number of documents from a MongoDB collection"""
