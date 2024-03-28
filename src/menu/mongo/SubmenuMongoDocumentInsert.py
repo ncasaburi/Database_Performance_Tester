@@ -107,7 +107,7 @@ class SubmenuMongoDocumentInsert():
         while current_file_document + pending_documents >= default_document_set:
             requested_documents_aux = default_document_set - current_file_document
 
-            #Unzipping and storing documents
+            #Unzipping and storing mongodb documents
             if content_mongo == "": #If this is the first iteration
 
                 content_mongo = content_mongo + '\n'.join(map(str, Zipper().unzip_content(Config().default_data["default_mongo_inserts"]+element+os.path.sep+str(default_document_set)+"_"+element.lower()+"_set"+str(default_mongo_last_file_read)+".zip","js").splitlines()[current_file_document:default_document_set+1])).removesuffix("])")
