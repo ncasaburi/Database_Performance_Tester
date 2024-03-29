@@ -2,8 +2,6 @@ from src.logger.SingleLogger import SingleLogger
 from pymongo import MongoClient
 import sys
 import time
-import zipfile
-import os
 import json
 
 class MongoDB():
@@ -59,7 +57,10 @@ class MongoDB():
                 self.connect(db_connection_string,db_name)
                 self.db.create_collection('test')
                 stop_counter = time.time()
-                SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
+                server_status = self.db.command('serverStatus')
+                resident_memory_mb = server_status['mem']['resident']
+                virtual_memory_mb = server_status['mem']['virtual']
+                SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB")    
                 SingleLogger().logger.info("Database "+db_name+" created")
 
         except Exception:
@@ -76,7 +77,10 @@ class MongoDB():
             self.client = MongoClient(db_connection_string)
             self.db = self.client[db_name]
             stop_counter = time.time()
-            SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
+            server_status = self.db.command('serverStatus')
+            resident_memory_mb = server_status['mem']['resident']
+            virtual_memory_mb = server_status['mem']['virtual']
+            SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB")
             SingleLogger().logger.info("Connection with "+db_connection_string+db_name+" has been established")
             self.__connection_string = db_connection_string
             self.__db_name = db_name
@@ -93,7 +97,10 @@ class MongoDB():
             start_counter = time.time()
             result = collection.update_many(query_update,update)
             stop_counter = time.time()
-            SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
+            server_status = self.db.command('serverStatus')
+            resident_memory_mb = server_status['mem']['resident']
+            virtual_memory_mb = server_status['mem']['virtual']
+            SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB")
             SingleLogger().logger.info("Total documents updated: " + str(result.modified_count))
             SingleLogger().logger.info("Query executed successfully.")
             return result
@@ -110,7 +117,10 @@ class MongoDB():
             start_counter = time.time()
             result = collection.delete_many(query_delete)
             stop_counter = time.time()
-            SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
+            server_status = self.db.command('serverStatus')
+            resident_memory_mb = server_status['mem']['resident']
+            virtual_memory_mb = server_status['mem']['virtual']
+            SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB")
             SingleLogger().logger.info("Total documents deleted: " + str(result.deleted_count))
             SingleLogger().logger.info("Query executed successfully.")
             return result
@@ -125,7 +135,10 @@ class MongoDB():
             start_counter = time.time()
             result = collection.find(query)
             stop_counter = time.time()
-            SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
+            server_status = self.db.command('serverStatus')
+            resident_memory_mb = server_status['mem']['resident']
+            virtual_memory_mb = server_status['mem']['virtual']
+            SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB")
             documents = list(result)
             count = collection.count_documents(query)
             SingleLogger().logger.info("Documents found " + str(count))
@@ -137,15 +150,19 @@ class MongoDB():
     def execute_query_insert(self, collection_default:str, query_insert:str):
         """This function inserts documents into a MongoDB collection"""
 
-        try:
+        try:           
             SingleLogger().logger.info("Inserting collection: "+collection_default+" on MongoDB...")
+            
             collection = self.db[collection_default]
             documents = json.loads(query_insert)
             start_counter = time.time()
             result = collection.insert_many(documents)
             stop_counter = time.time()
-            SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
-            SingleLogger().logger.info("Total documents inserted: " + str(len(result.inserted_ids)))
+            server_status = self.db.command('serverStatus')
+            resident_memory_mb = server_status['mem']['resident']
+            virtual_memory_mb = server_status['mem']['virtual']
+            SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB")
+            SingleLogger().logger.info("Total documents inserted: " + str(len(result.inserted_ids)))            
             return result
         except Exception as error:
             SingleLogger().logger.exception("Error while inserting documents on MongoDB", exc_info=True)
@@ -200,7 +217,10 @@ class MongoDB():
                 self.client.drop_database(db_name)
                 self.__db_name = None
                 stop_counter = time.time()
-                SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
+                server_status = self.db.command('serverStatus')
+                resident_memory_mb = server_status['mem']['resident']
+                virtual_memory_mb = server_status['mem']['virtual']
+                SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB")
                 SingleLogger().logger.info("The database "+db_name+" has been dropped")
             #self.close()
         except Exception:

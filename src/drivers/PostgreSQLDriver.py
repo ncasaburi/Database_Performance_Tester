@@ -101,7 +101,7 @@ class PostgreSQL():
         """This function executes a query and prints the description and returns a list with the results"""
 
         try:
-            SingleLogger().logger.info("Executing sql query...")
+            
             if not description == "":
                 SingleLogger().logger.info(description)
             start_counter = time.time()
@@ -109,6 +109,7 @@ class PostgreSQL():
             stop_counter = time.time()
             SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
             SingleLogger().logger.info("The sql query has been executed")
+            SingleLogger().logger.info(f"current timeout: {self.conn.get_parameter_status('connect_timeout')}")
             if expected_result == True and self.cursor.rowcount > 0:
                 return self.cursor.fetchall()
         except Exception:
