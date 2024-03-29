@@ -1,9 +1,9 @@
 from consolemenu import *
 from consolemenu.items import *
-from src.menu.postgres.SubmenuPostgresDatabase import SubmenuPostgresDatabase
-from src.menu.postgres.SubmenuPostgresTable import SubmenuPostgresTable
-from src.menu.postgres.SubmenuPostgresRow import SubmenuPostgresRow
-from src.menu.status import status
+from src.menu.postgres.Database.SubmenuPostgresDatabase import SubmenuPostgresDatabase
+from src.menu.postgres.Table.SubmenuPostgresTable import SubmenuPostgresTable
+from src.menu.postgres.Row.SubmenuPostgresRow import SubmenuPostgresRow
+from src.logic.status import status
 
 class SubmenuPostgres():
 

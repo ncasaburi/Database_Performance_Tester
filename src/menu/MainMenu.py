@@ -3,13 +3,13 @@ from consolemenu.items import *
 from src.menu.postgres.SubmenuPostgres import SubmenuPostgres
 from src.menu.mongo.SubmenuMongo import SubmenuMongo
 from src.menu.miscellaneous.SubmenuMiscellaneous import SubmenuMiscellaneous
-from src.menu.status import status
+from src.logic.status import status
 
 class MainMenu():
 
     def __init__(self) -> None:
         """This function initializes the CustomMenu class"""
-
+        
         #menu definition
         menu = ConsoleMenu("Database Performance Tester", status )
 
@@ -26,4 +26,3 @@ class MainMenu():
         #display menu
         menu.start()
         menu.join()
-         
