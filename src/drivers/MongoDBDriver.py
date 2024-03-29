@@ -3,6 +3,7 @@ from pymongo import MongoClient
 import sys
 import time
 import json
+import ast
 
 class MongoDB():
     _instance = None
@@ -139,7 +140,7 @@ class MongoDB():
             SingleLogger().logger.exception("Error while deleting documents on MongoDB", exc_info=True)
             return None
 
-    def execute_query_find(self, collection_name, query):
+    def execute_query_find(self, collection_name, query:dict):
         """This function executy a query to find documents"""
 
         try:
@@ -151,7 +152,7 @@ class MongoDB():
             server_status = self.db.command('serverStatus')
             resident_memory_mb = server_status['mem']['resident']
             virtual_memory_mb = server_status['mem']['virtual']
-            SingleLogger().logger.info("Number of documents found " + str(self.count_documents(query)))
+            SingleLogger().logger.info("Number of documents found " + str(self.count_documents(collection_name)))
             SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB")
             return list(result)
         except Exception as error:

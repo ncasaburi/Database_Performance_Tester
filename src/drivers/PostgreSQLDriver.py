@@ -2,7 +2,6 @@ from src.logger.SingleLogger import SingleLogger
 import psycopg2
 import time
 import sys
-import psutil
 
 class PostgreSQL():
     _instance = None
