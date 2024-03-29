@@ -23,7 +23,6 @@ def mongo_collection_list_fn(enable_interaction:bool=True):
                 print("Press enter to continue...")
                 input()
                 return
-        input()
         return
     except:
         SingleLogger().logger.exception("Error while listing MongoDB collections", exc_info=True)
