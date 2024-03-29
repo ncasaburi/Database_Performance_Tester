@@ -9,6 +9,8 @@
 * Universidad Nacional de La Plata
 
 ### Steps to run the performance test:
+> [!NOTE]
+> This software requires Python version 3.10 or newer.
 1. Clone the repository
 ```
 git clone https://github.com/ncasaburi/Databases_Performance_Test.git
@@ -29,6 +31,3 @@ python3 -m venv .venv; . .venv/bin/activate; pip install -r requirements.txt
 ```
 python3 __main__.py
 ```
-
-> [!NOTE]
-> This software requires python 10 or newer.
