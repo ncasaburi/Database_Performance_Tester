@@ -25,11 +25,10 @@ docker-compose up -d
 ```
 python3 -m venv .venv; . .venv/bin/activate; pip install -r requirements.txt
 ```
-5. Generate new SQL files (optional)
-```
-python3 Queries/PostgreSQL/SQLGenerator.py 
-```
-6. Run performance tests
+5. Run performance tests
 ```
 python3 __main__.py
 ```
+
+> [!NOTE]
+> This software requires python 10 or newer.
