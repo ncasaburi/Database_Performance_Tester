@@ -126,8 +126,6 @@ class PostgreSQL():
             self.cursor.execute(query)
             stop_counter = time.time()
             SingleLogger().logger.info("The sql query has been executed")
-            resident_mem, virtual_mem = self.memory_usage()
-            SingleLogger().logger.info("Resident memory: "+str(resident_mem)+" MB, Virtual memory: "+str(virtual_mem)+" MB")
             SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
             if expected_result == True and self.cursor.rowcount > 0:
                 return self.cursor.fetchall()
@@ -159,27 +157,6 @@ class PostgreSQL():
             return round(self.cursor.fetchone()[0] / (1024 * 1024), 3)
         except Exception:
             SingleLogger().logger.exception("Error while getting space occupied by the table: "+str(tablename), exc_info=True)
-            sys.exit(1)
-
-    def memory_usage(self):
-        """This function gets the resident and virtual memory usages"""
-
-        try:
-            # for proc in psutil.process_iter(['name', 'cmdline']):
-            #     if 'postgres' in proc.info['name'] and 'docker' in ' '.join(proc.info['cmdline']):
-            #         postgres_proc = proc
-            #         break
-            # if 'postgres_proc' in locals():
-            #     mem = postgres_proc.memory_info()
-            #     resident_mem = mem.rss  # Resident memory in bytes
-            #     virtual_mem = mem.vms  # Virtual memory in bytes
-            #     resident_mem = resident_mem / (1024 ** 2) # Resident memory in MB
-            #     virtual_mem = virtual_mem / (1024 ** 2) # Virtual memory in MB
-            #     return (resident_mem, virtual_mem)
-            # else:
-                return ("Unknown", "Unknown")
-        except Exception:
-            SingleLogger().logger.exception("Error while getting memory usage for PostgreSQL", exc_info=True)
             sys.exit(1)
 
     @property
