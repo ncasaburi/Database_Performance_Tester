@@ -4,4 +4,3 @@ faker
 tqdm
 ansicolors
 console-menu
-psutil
