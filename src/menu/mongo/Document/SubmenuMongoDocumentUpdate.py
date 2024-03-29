@@ -6,7 +6,7 @@ from src.logic.mongo.document.mongo_document_update import mongo_document_update
 class SubmenuMongoDocumentUpdate():
 
     def __init__(self) -> None:
-        """This function initializes the SubmenuPostgresRowUpdate class"""
+        """This function initializes the SubmenuMongoDocumentUpdate class"""
         
         #submenu definition
         self.submenu_mongo_document_update = ConsoleMenu("MongoDB Document Updates", status)

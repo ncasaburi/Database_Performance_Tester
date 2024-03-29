@@ -6,7 +6,7 @@ from src.logic.mongo.collection.mongo_collection_drop import mongo_collection_dr
 class SubmenuMongoCollectionDrop():
 
     def __init__(self) -> None:
-        """This function initializes the SubmenuPostgresTableDrop class"""
+        """This function initializes the SubmenuMongoCollectionDrop class"""
         
         #submenu definition
         self.submenu_mongo_collection_drop = ConsoleMenu("MongoDB Collection Drop", status)
