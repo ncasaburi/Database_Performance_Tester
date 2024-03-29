@@ -1,9 +1,9 @@
 from consolemenu import *
 from consolemenu.items import *
-from src.menu.mongo.SubmenuMongoDatabase import SubmenuMongoDatabase
-from src.menu.mongo.SubmenuMongoCollection import SubmenuMongoCollection
-from src.menu.mongo.SubmenuMongoDocument import SubmenuMongoDocument
-from src.menu.status import status
+from src.menu.mongo.Database.SubmenuMongoDatabase import SubmenuMongoDatabase
+from src.menu.mongo.Collection.SubmenuMongoCollection import SubmenuMongoCollection
+from src.menu.mongo.Document.SubmenuMongoDocument import SubmenuMongoDocument
+from src.logic.status import status
 
 class SubmenuMongo():
 
