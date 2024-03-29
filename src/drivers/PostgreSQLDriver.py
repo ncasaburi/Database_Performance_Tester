@@ -2,6 +2,7 @@ from src.logger.SingleLogger import SingleLogger
 import psycopg2
 import time
 import sys
+import psutil
 
 class PostgreSQL():
     _instance = None
@@ -33,7 +34,7 @@ class PostgreSQL():
 
         try:
             if not db_name == "":
-                SingleLogger().logger.info("Checking whether Postgres database "+db_name+" exist or not...")
+                SingleLogger().logger.info("Checking Postgres database "+db_name+" existence...")
                 conn_temp = psycopg2.connect(db_connection_string+db_name)
                 cursor_temp = conn_temp.cursor()
                 cursor_temp.execute("SELECT datname FROM pg_database")
@@ -72,8 +73,8 @@ class PostgreSQL():
                 self.connect(db_connection_string, "")
                 self.cursor.execute('CREATE DATABASE '+db_name)
                 stop_counter = time.time()
-                SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
                 SingleLogger().logger.info("Database "+db_name+" created")
+                SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
                 self.connect(db_connection_string,db_name)
         except Exception:
             SingleLogger().logger.exception("Error while connecting to PostgreSQL", exc_info=True)
@@ -91,8 +92,8 @@ class PostgreSQL():
                 stop_counter = time.time()
                 self.conn.set_session(autocommit=True)
                 self.cursor = self.conn.cursor()
-                SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
                 SingleLogger().logger.info("Connection with "+db_connection_string+db_name+" has been established")
+                SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
                 self.__connection_string = db_connection_string
         except Exception:
             SingleLogger().logger.exception("Error while connecting to "+db_connection_string+db_name+" on PostgreSQL", exc_info=True)
@@ -108,8 +109,8 @@ class PostgreSQL():
                 start_counter = time.time()
                 self.cursor.execute('DROP DATABASE IF EXISTS '+db_name)
                 stop_counter = time.time()
-                SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
                 SingleLogger().logger.info("The database "+db_name+" has been dropped")
+                SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
             self.close()
         except Exception:
             SingleLogger().logger.exception("Error while dropping database on PostgreSQL", exc_info=True)
@@ -124,9 +125,10 @@ class PostgreSQL():
             start_counter = time.time()
             self.cursor.execute(query)
             stop_counter = time.time()
-            SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
             SingleLogger().logger.info("The sql query has been executed")
-            SingleLogger().logger.info(f"current timeout: {self.conn.get_parameter_status('connect_timeout')}")
+            resident_mem, virtual_mem = self.memory_usage()
+            SingleLogger().logger.info("Resident memory: "+str(resident_mem)+" MB, Virtual memory: "+str(virtual_mem)+" MB")
+            SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
             if expected_result == True and self.cursor.rowcount > 0:
                 return self.cursor.fetchall()
         except Exception:
@@ -144,9 +146,40 @@ class PostgreSQL():
                 self.conn.close()
                 del self.conn
             self.__connection_string = None
-            SingleLogger().logger.info("Connection closed\n")
+            SingleLogger().logger.info("Connection closed")
         except Exception:
             SingleLogger().logger.exception("Error while closing PostgreSQL cursor and connection", exc_info=True)
+            sys.exit(1)
+
+    def table_space_occupied(self, tablename:str):
+        """This function returns the space occupied by a table in MB"""
+
+        try:
+            self.cursor.execute("SELECT pg_total_relation_size('"+str(tablename)+"') AS total_size;")
+            return round(self.cursor.fetchone()[0] / (1024 * 1024), 3)
+        except Exception:
+            SingleLogger().logger.exception("Error while getting space occupied by the table: "+str(tablename), exc_info=True)
+            sys.exit(1)
+
+    def memory_usage(self):
+        """This function gets the resident and virtual memory usages"""
+
+        try:
+            # for proc in psutil.process_iter(['name', 'cmdline']):
+            #     if 'postgres' in proc.info['name'] and 'docker' in ' '.join(proc.info['cmdline']):
+            #         postgres_proc = proc
+            #         break
+            # if 'postgres_proc' in locals():
+            #     mem = postgres_proc.memory_info()
+            #     resident_mem = mem.rss  # Resident memory in bytes
+            #     virtual_mem = mem.vms  # Virtual memory in bytes
+            #     resident_mem = resident_mem / (1024 ** 2) # Resident memory in MB
+            #     virtual_mem = virtual_mem / (1024 ** 2) # Virtual memory in MB
+            #     return (resident_mem, virtual_mem)
+            # else:
+                return ("Unknown", "Unknown")
+        except Exception:
+            SingleLogger().logger.exception("Error while getting memory usage for PostgreSQL", exc_info=True)
             sys.exit(1)
 
     @property
