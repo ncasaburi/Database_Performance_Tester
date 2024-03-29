@@ -5,6 +5,7 @@ from src.logger.SingleLogger import SingleLogger
 from src.config.Config import Config
 from src.logic.miscellaneous.miscellaneous_autoconnect import autoconnect_read
 import os
+import sys
 
 def status() -> str:
     
@@ -19,21 +20,26 @@ def status() -> str:
 def database_check(db, default_database_autoconnect:bool, default_connection_string:str, default_database_name:str) -> list:
     """This function checks whether there is a database connection established. Also, the function autoconnects to a default database if this option is enabled"""
 
-    current_stauts = db().status()
+    try:
+        current_stauts = db().status()
 
-    if current_stauts == "Disconnected":
+        if current_stauts == "Disconnected":
+            # if default_database_autoconnect == True and db().exist(default_connection_string,default_database_name):
+            if default_database_autoconnect == True:
+                db().connect(default_connection_string,default_database_name)
+                current_stauts = db().status()
+
+        if current_stauts == "Disconnected":
+            current_stauts = color(current_stauts, fg="red")
+        else:
+            current_stauts = color(current_stauts, fg="green")
+
         if default_database_autoconnect == True:
-            db().connect(default_connection_string,default_database_name)
-            current_stauts = db().status()
+            autoconnect = color("on", fg="green")
+        else:
+            autoconnect = color("off", fg="red")
 
-    if current_stauts == "Disconnected":
-        current_stauts = color(current_stauts, fg="red")
-    else:
-        current_stauts = color(current_stauts, fg="green")
-
-    if default_database_autoconnect == True:
-        autoconnect = color("on", fg="green")
-    else:
-        autoconnect = color("off", fg="red")
-
-    return current_stauts, autoconnect
+        return current_stauts, autoconnect
+    except Exception:
+            SingleLogger().logger.exception("Error while checking databases status", exc_info=True)
+            sys.exit(1)            
