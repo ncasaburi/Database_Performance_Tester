@@ -32,29 +32,44 @@ class PostgreSQL():
         """This function checks whether the database exists or not"""
 
         try:
-            SingleLogger().logger.info("Checking whether database "+db_name+" exist or not...")
-            self.connect(db_connection_string, "")
-            self.cursor.execute("SELECT datname FROM pg_database")
-            databases = self.cursor.fetchall()
-            if (db_name,) in databases:
-                SingleLogger().logger.info("Database "+db_name+" already exists")
-                return True
+            if not db_name == "":
+                SingleLogger().logger.info("Checking whether Postgres database "+db_name+" exist or not...")
+                conn_temp = psycopg2.connect(db_connection_string+db_name)
+                cursor_temp = conn_temp.cursor()
+                cursor_temp.execute("SELECT datname FROM pg_database")
+                databases = cursor_temp.fetchall()
+                if (db_name,) in databases:
+                    SingleLogger().logger.info("Postgres database "+db_name+" already exists")
+                    cursor_temp.close()
+                    del cursor_temp
+                    conn_temp.close()
+                    del conn_temp
+                    return True
+                else:
+                    SingleLogger().logger.info("Postgres database "+db_name+" doesn't exists")
+                    return False
             else:
-                SingleLogger().logger.info("Database "+db_name+" doesn't exists")
-                return False   
+                try:
+                    conn_temp = psycopg2.connect(db_connection_string)
+                    conn_temp.close()
+                    del conn_temp
+                    return True
+                except Exception:
+                    SingleLogger().logger.info("The connection with "+db_connection_string+" couldn't be established")
+                    return False                  
         except Exception:
-            SingleLogger().logger.exception("Error while checking PostgreSQL database existence", exc_info=True)
-            sys.exit(1)            
+            SingleLogger().logger.info("Postgres database "+db_name+" doesn't exists")
+            return False          
 
     def create(self, db_connection_string, db_name):
         """This function creates a database on PostgreSQL"""
 
         try:
             SingleLogger().logger.info("Creating database "+db_name+" on postgreSQL...")
-            if hasattr(self, 'cursor') and self.cursor:
-                self.close()
+            self.close()
             if not self.exist(db_connection_string, db_name):
                 start_counter = time.time()
+                self.connect(db_connection_string, "")
                 self.cursor.execute('CREATE DATABASE '+db_name)
                 stop_counter = time.time()
                 SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
@@ -68,15 +83,17 @@ class PostgreSQL():
         """This function establishes a connection with a postgreSQL database"""
         
         try:
-            SingleLogger().logger.info("Connecting to "+db_connection_string+db_name+" on postgreSQL...")
-            start_counter = time.time()
-            self.conn = psycopg2.connect(db_connection_string+db_name)
-            stop_counter = time.time()
-            self.conn.set_session(autocommit=True)
-            self.cursor = self.conn.cursor()
-            SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
-            SingleLogger().logger.info("Connection with "+db_connection_string+db_name+" has been established")
-            self.__connection_string = db_connection_string
+            self.close()
+            if self.exist(db_connection_string, db_name):
+                SingleLogger().logger.info("Connecting to "+db_connection_string+db_name+" on postgreSQL...")
+                start_counter = time.time()
+                self.conn = psycopg2.connect(db_connection_string+db_name)
+                stop_counter = time.time()
+                self.conn.set_session(autocommit=True)
+                self.cursor = self.conn.cursor()
+                SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
+                SingleLogger().logger.info("Connection with "+db_connection_string+db_name+" has been established")
+                self.__connection_string = db_connection_string
         except Exception:
             SingleLogger().logger.exception("Error while connecting to "+db_connection_string+db_name+" on PostgreSQL", exc_info=True)
             sys.exit(1)
@@ -86,6 +103,7 @@ class PostgreSQL():
         
         try:
             SingleLogger().logger.info("Dropping the database "+db_name+" from postgreSQL...")
+            self.connect(db_connection_string, "postgres") #This connection is needed to drop another database
             if self.exist(db_connection_string, db_name):
                 start_counter = time.time()
                 self.cursor.execute('DROP DATABASE IF EXISTS '+db_name)
@@ -101,7 +119,6 @@ class PostgreSQL():
         """This function executes a query and prints the description and returns a list with the results"""
 
         try:
-            
             if not description == "":
                 SingleLogger().logger.info(description)
             start_counter = time.time()
@@ -122,8 +139,10 @@ class PostgreSQL():
         try:
             if hasattr(self, 'cursor'):
                 self.cursor.close()
+                del self.cursor
             if hasattr(self, 'conn'):
                 self.conn.close()
+                del self.conn
             self.__connection_string = None
             SingleLogger().logger.info("Connection closed\n")
         except Exception:
