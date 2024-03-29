@@ -1,6 +1,7 @@
 from src.drivers.PostgreSQLDriver import PostgreSQL
 from src.logger.SingleLogger import SingleLogger
 from datetime import datetime
+from src.logic.postgres.table.postgres_table_list import postgres_table_list_fn
 
 def postgres_row_update_fn(type:str):
     """This function allows the user to update rows into a PostgreSQL database"""       
@@ -22,27 +23,17 @@ def postgres_row_update_fn(type:str):
             postgres.run_query("UPDATE doctors SET name = 'Mark' WHERE id_doctor IN ( SELECT id_doctor FROM doctors ORDER BY id_doctor DESC LIMIT "+str(rows_to_update)+" )", "Updating "+str(rows_to_update)+" doctors...")
 
         else:
-            table_list = postgres.run_query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_catalog = '"+postgres.status()+"';", expected_result=True)
-            print("Tables:\n")
-            for table in table_list:
-                print(" - "+str(table[0])+" (rows: "+str(postgres.run_query("SELECT COUNT(*) FROM "+str(table[0]),"",expected_result=True)[0][0])+", columns: "+str(postgres.run_query("SELECT COUNT(*) FROM information_schema.columns WHERE table_name = '"+str(table[0])+"';","",expected_result=True)[0][0])+")")
-                print("   ("+', '.join(item[0] for item in postgres.run_query("SELECT column_name FROM information_schema.columns WHERE table_name = '"+str(table[0])+"'","",expected_result=True))+")")
-            print("")
-            print("Enter your query to update rows: (if a field doesn't apply, press enter)\n")
-            print("  Example:")
-            print("    UPDATE tablename")
-            print("    SET column1 = 'value1', column2 = 'value2'")
-            print("    WHERE condition")
-            tablename = input("\n\n  UPDATE ")
-            set = input("  SET ")
-            condition = input("  WHERE ")
-            query = ""
-            if not tablename == "":
-                query = "UPDATE "+tablename
-            if not set == "":
-                query = query + " " + "SET "+set
-            if not condition == "":
-                query = query + " " + "WHERE "+ condition
-            postgres.run_query(query,"Updating rows with custom query...")
+            postgres_table_list_fn(enable_interaction=False)
+            print("Enter your query to update rows:\n")
+            print("  Example:\n")
+            print("    UPDATE tablename SET column1 = 'value1', column2 = 'value2' WHERE condition;")
+            print("  \n  Your query:\n")
+            query = input("    UPDATE ")
+            if not query.startswith("UPDATE") or not query.startswith("update"):
+                query = "UPDATE " + query
+            postgres.run_query(query,"Executing custom update on PostgreSQL...")
+            print("\nDone!\n")
+            print("\nPress enter to continue...")
+            input()
     except:
         SingleLogger().logger.exception("Error while updating rows on PostgreSQL", exc_info=True)

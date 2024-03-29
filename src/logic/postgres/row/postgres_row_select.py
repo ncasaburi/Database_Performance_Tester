@@ -21,7 +21,6 @@ def postgres_row_select_fn(type:str):
             print("Enter your query to select rows:\n")
             print("  Example:\n")
             print("    SELECT column1, column2 FROM tablename WHERE condition;")
-            
             print("  \n  Your query:\n")
             query = input("    SELECT ")
             if not query.startswith("SELECT") or not query.startswith("select"):
@@ -31,6 +30,5 @@ def postgres_row_select_fn(type:str):
             print("  "+'\n  '.join(map(str, result)))
             print("\n\nPress enter to continue...")
             input()
-
     except:
         SingleLogger().logger.exception("Error while selecting rows to PostgreSQL", exc_info=True)

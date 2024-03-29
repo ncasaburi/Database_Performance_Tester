@@ -1,5 +1,6 @@
 from src.drivers.PostgreSQLDriver import PostgreSQL
 from src.logger.SingleLogger import SingleLogger
+from src.logic.postgres.table.postgres_table_list import postgres_table_list_fn
 
 def postgres_row_delete_fn(type:str) -> None:
     """This function allows the user to delete rows ina a table"""
@@ -14,23 +15,17 @@ def postgres_row_delete_fn(type:str) -> None:
             postgres.run_query("DELETE FROM patients WHERE id_patient IN ( SELECT id_patient FROM patients ORDER BY id_patient DESC LIMIT "+str(rows_to_delete)+" )","Deleting "+str(rows_to_delete)+" patients...")
             postgres.run_query("DELETE FROM doctors WHERE id_doctor IN ( SELECT id_doctor FROM doctors ORDER BY id_doctor DESC LIMIT "+str(rows_to_delete)+" )","Deleting "+str(rows_to_delete)+" doctors...")
         else:
-            table_list = postgres.run_query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_catalog = '"+postgres.status()+"';", expected_result=True)
-            print("Tables:\n")
-            for table in table_list:
-                print(" - "+str(table[0])+" (rows: "+str(postgres.run_query("SELECT COUNT(*) FROM "+str(table[0]),"",expected_result=True)[0][0])+", columns: "+str(postgres.run_query("SELECT COUNT(*) FROM information_schema.columns WHERE table_name = '"+str(table[0])+"';","",expected_result=True)[0][0])+")")
-                print("   ("+', '.join(item[0] for item in postgres.run_query("SELECT column_name FROM information_schema.columns WHERE table_name = '"+str(table[0])+"'","",expected_result=True))+")")
-            print("")
+            postgres_table_list_fn(enable_interaction=False)
             print("Enter your query to delete rows:\n")
-            print("  Example:")
-            print("    DELETE FROM tablename")
-            print("    WHERE condition")
-            tablename = input("\n\n  DELETE FROM ")
-            condition = input("  WHERE ")
-            query = ""
-            if not tablename == "":
-                query = "DELETE FROM "+tablename
-            if not condition == "":
-                query = query + " " + "WHERE "+ condition
-            postgres.run_query(query)
+            print("  Example:\n")
+            print("    DELETE FROM tablename WHERE condition")
+            print("  \n  Your query:\n")
+            query = input("    DELETE FROM ")
+            if not query.startswith("DELETE FROM") or not query.startswith("delete from"):
+                query = "DELETE FROM " + query
+            postgres.run_query(query,"Executing custom delete on PostgreSQL...")
+            print("\nDone!\n")
+            print("\nPress enter to continue...")
+            input()
     except:
         SingleLogger().logger.exception("Error while deleting rows to PostgreSQL", exc_info=True)
