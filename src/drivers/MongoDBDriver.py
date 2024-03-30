@@ -84,18 +84,17 @@ class MongoDB():
 
         try:
             self.close()
-            if self.exist(db_connection_string, db_name):
-                SingleLogger().logger.info("Connecting to "+db_connection_string+db_name+" on MongoDB...")
-                start_counter = time.time()
-                self.client = MongoClient(db_connection_string)
-                self.db = self.client[db_name]
-                stop_counter = time.time()
-                server_status = self.db.command('serverStatus')
-                resident_memory_mb = server_status['mem']['resident']
-                virtual_memory_mb = server_status['mem']['virtual']
-                SingleLogger().logger.info("Connection with "+db_connection_string+db_name+" has been established")
-                SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB")
-                self.__connection_string = db_connection_string
+            SingleLogger().logger.info("Connecting to "+db_connection_string+db_name+" on MongoDB...")
+            start_counter = time.time()
+            self.client = MongoClient(db_connection_string)
+            self.db = self.client[db_name]
+            stop_counter = time.time()
+            server_status = self.db.command('serverStatus')
+            resident_memory_mb = server_status['mem']['resident']
+            virtual_memory_mb = server_status['mem']['virtual']
+            SingleLogger().logger.info("Connection with "+db_connection_string+db_name+" has been established")
+            SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB")
+            self.__connection_string = db_connection_string
         except Exception as error:
             SingleLogger().logger.exception("Error while connecting to "+db_connection_string+db_name+" on MongoDB", exc_info=True)
             sys.exit(1)
@@ -173,7 +172,7 @@ class MongoDB():
             resident_memory_mb = server_status['mem']['resident']
             virtual_memory_mb = server_status['mem']['virtual']
             SingleLogger().logger.info("Number of documents inserted: " + str(len(result.inserted_ids)))            
-            SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB")
+            SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB, Collection: {collection_name} space occupied: {self.collection_space_occupied(collection_name)} MB")
             return result
         except Exception as error:
             SingleLogger().logger.exception("Error while inserting documents on MongoDB", exc_info=True)
@@ -228,45 +227,39 @@ class MongoDB():
             SingleLogger().logger.exception("Error while counting documents on MongoDB", exc_info=True)
             sys.exit(1)
 
-    def drop(self, db_name):
+    def drop(self, db_connection_string, db_name):
         """This function drops a MongoDB database"""
         
         try:
             SingleLogger().logger.info("Dropping the database "+db_name+" from MongoDB...")
-            if self.exist(db_name):
-                start_counter = time.time()
-                self.client.drop_database(db_name)
-                stop_counter = time.time()
-                server_status = self.db.command('serverStatus')
-                resident_memory_mb = server_status['mem']['resident']
-                virtual_memory_mb = server_status['mem']['virtual']
-                SingleLogger().logger.info("The database "+db_name+" has been dropped")
-                SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB")
+            previous_db = None
+            previous_connection_string = None
+            if not (self.status() == "Disconnected") and not (self.status() == db_name):
+                previous_db = self.db.name
+                previous_connection_string = self.__connection_string
+            self.connect(db_connection_string,db_name)
+            start_counter = time.time()
+            self.client.drop_database(db_name)
+            stop_counter = time.time()
+            server_status = self.db.command('serverStatus')
+            resident_memory_mb = server_status['mem']['resident']
+            virtual_memory_mb = server_status['mem']['virtual']
+            SingleLogger().logger.info("The database "+db_name+" has been dropped")
+            SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB")
             self.close()
+            if not (previous_connection_string == None) and not (previous_db == None):
+                self.connect(previous_connection_string,previous_db)
+            del previous_connection_string
+            del previous_db
         except Exception:
             SingleLogger().logger.exception("Error while dropping database on MongoDB", exc_info=True)
-            sys.exit(1)
-
-    def close(self):
-        """This function closes the cursor and connection"""
-
-        try:
-            if hasattr(self, 'client'):
-                self.client.close()
-                del self.client
-            if hasattr(self, 'db'):
-                del self.db
-            self.__connection_string = None
-            SingleLogger().logger.info("Connection closed")
-        except Exception:
-            SingleLogger().logger.exception("Error while closing MongoDB cursor and connection", exc_info=True)
             sys.exit(1)
 
     def create_collection(self, collection_name):
         """This function creates a collection"""
         
         try:
-            self.db.create_collection(collection_name)
+            self.db[collection_name]
             SingleLogger().logger.info("Collection "+collection_name+" created successfully.")
             return True
         except Exception as error:
@@ -331,3 +324,18 @@ class MongoDB():
     @connection_string.setter
     def logger(self, connection_string) -> None:
         self.__connection_string = connection_string
+
+    def close(self):
+        """This function closes the cursor and connection"""
+
+        try:
+            if hasattr(self, 'client'):
+                self.client.close()
+                del self.client
+            if hasattr(self, 'db'):
+                del self.db
+            self.__connection_string = None
+            SingleLogger().logger.info("Connection closed")
+        except Exception:
+            SingleLogger().logger.exception("Error while closing MongoDB cursor and connection", exc_info=True)
+            sys.exit(1)

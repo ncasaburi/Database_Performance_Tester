@@ -2,6 +2,7 @@ from src.logger.SingleLogger import SingleLogger
 import psycopg2
 import time
 import sys
+import re
 
 class PostgreSQL():
     _instance = None
@@ -119,15 +120,22 @@ class PostgreSQL():
         """This function executes a query and prints the description and returns a list with the results"""
 
         try:
+            result = ""
             if not description == "":
                 SingleLogger().logger.info(description)
             start_counter = time.time()
             self.cursor.execute(query)
             stop_counter = time.time()
             SingleLogger().logger.info("The sql query has been executed")
-            SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
             if expected_result == True and self.cursor.rowcount > 0:
-                return self.cursor.fetchall()
+                result = self.cursor.fetchall()
+            pattern = r"FROM\s+(\w+)"
+            tablename = re.search(pattern, query, re.IGNORECASE)
+            if tablename and not (tablename.group(1) == "information_schema"):
+                SingleLogger().logger.info(f"Done! Elapsed time: {(stop_counter - start_counter)} seconds, Table: {tablename.group(1)} space occupied: {self.table_space_occupied(tablename.group(1))} MB")
+            else:
+                SingleLogger().logger.info("Done! Elapsed time: "+str(stop_counter - start_counter)+" seconds")
+            return result
         except Exception:
             SingleLogger().logger.exception("Error while running query to PostgreSQL", exc_info=True)
             sys.exit(1)
