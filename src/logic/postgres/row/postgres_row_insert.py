@@ -4,7 +4,7 @@ from src.config.Zipper import Zipper
 from src.logger.SingleLogger import SingleLogger
 import os
 
-def postgres_row_insert_fn(type:str):
+def postgres_row_insert_fn(type:str, requested_rows:int=0, current_iteration:int=0, total_iterations:int=0):
     """This function allows the user to insert rows into a PostgreSQL database"""       
     
     try:
@@ -13,38 +13,40 @@ def postgres_row_insert_fn(type:str):
             default_insert_set = int(Config().default_memory["default_insert_set"])
             default_number_files = int(Config().default_memory["default_insert_files"])
 
-            actual_doctor_rows = postgres.run_query("SELECT COUNT(*) FROM doctors","",expected_result=True)[0][0]
-            actual_patient_rows = postgres.run_query("SELECT COUNT(*) FROM patients","",expected_result=True)[0][0]
-            actual_medicalrecord_rows = postgres.run_query("SELECT COUNT(*) FROM medical_records","",expected_result=True)[0][0]
-            actual_doctormedicalrecord_rows = postgres.run_query("SELECT COUNT(*) FROM doctor_medical_records","",expected_result=True)[0][0]
-            if actual_doctor_rows == 0 and actual_patient_rows == 0 and actual_medicalrecord_rows == 0 and actual_doctormedicalrecord_rows == 0:
-                Config().default_postgres_lines_read = 0
-                Config().default_postgres_last_file_read = 0
+            if requested_rows == 0:
+                actual_doctor_rows = postgres.run_query("SELECT COUNT(*) FROM doctors","",expected_result=True)[0][0]
+                actual_patient_rows = postgres.run_query("SELECT COUNT(*) FROM patients","",expected_result=True)[0][0]
+                actual_medicalrecord_rows = postgres.run_query("SELECT COUNT(*) FROM medical_records","",expected_result=True)[0][0]
+                actual_doctormedicalrecord_rows = postgres.run_query("SELECT COUNT(*) FROM doctor_medical_records","",expected_result=True)[0][0]
+                if actual_doctor_rows == 0 and actual_patient_rows == 0 and actual_medicalrecord_rows == 0 and actual_doctormedicalrecord_rows == 0:
+                    Config().default_postgres_lines_read = 0
+                    Config().default_postgres_last_file_read = 1
 
-            rows_left = (default_insert_set * default_number_files) - Config().default_postgres_lines_read
+                rows_left = (default_insert_set * default_number_files) - Config().default_postgres_lines_read
 
-            #If there are rows left and tables count of rows is the same as the number stored on variable default_postgres_lines_read
-            if rows_left > 0 and actual_doctor_rows == Config().default_postgres_lines_read and actual_patient_rows == Config().default_postgres_lines_read and actual_medicalrecord_rows == Config().default_postgres_lines_read and actual_doctormedicalrecord_rows == Config().default_postgres_lines_read:
-                os.system('clear')
-                print("Please, enter the number of rows you want to insert: ("+str(rows_left)+" rows left)")
-                requested_rows = int(input())
+            #If there are rows left and the number of rows on each table is the same as the number stored on default_postgres_lines_read
+            if (requested_rows > 0) or (rows_left > 0 and actual_doctor_rows == Config().default_postgres_lines_read and actual_patient_rows == Config().default_postgres_lines_read and actual_medicalrecord_rows == Config().default_postgres_lines_read and actual_doctormedicalrecord_rows == Config().default_postgres_lines_read):
+                if requested_rows == 0:
+                    os.system('clear')
+                    print("Please, enter the number of rows you want to insert: ("+str(rows_left)+" rows left)")
+                    requested_rows = int(input())
 
-                if requested_rows > rows_left:
-                    print("The number of rows requested exceed the number of rows left.\nAs a result, "+str(rows_left)+" rows will be inserted")
-                    input("Press enter to continue")
-                    requested_rows = rows_left
+                    if requested_rows > rows_left:
+                        print("The number of rows requested exceed the number of rows left.\nAs a result, "+str(rows_left)+" rows will be inserted")
+                        input("Press enter to continue")
+                        requested_rows = rows_left
                 
                 os.system('clear')
-                print("Doctors:")
+                (lambda current_iteration, total_iterations: print("Doctors:") if total_iterations == 0 else print("Doctors:   (batch "+str(current_iteration)+"/"+str(total_iterations)+")"))(current_iteration, total_iterations)
                 load_sql_content("Doctors", requested_rows, default_insert_set, Config().default_postgres_lines_read, Config().default_postgres_last_file_read, postgres)
                 os.system('clear')
-                print("Patients:")
+                (lambda current_iteration, total_iterations: print("Patients:") if total_iterations == 0 else print("Patients:   (batch "+str(current_iteration)+"/"+str(total_iterations)+")"))(current_iteration, total_iterations)
                 load_sql_content("Patients", requested_rows, default_insert_set, Config().default_postgres_lines_read, Config().default_postgres_last_file_read, postgres)
                 os.system('clear')
-                print("MedicalRecords:")
+                (lambda current_iteration, total_iterations: print("MedicalRecords:") if total_iterations == 0 else print("MedicalRecords:   (batch "+str(current_iteration)+"/"+str(total_iterations)+")"))(current_iteration, total_iterations)
                 load_sql_content("MedicalRecords", requested_rows, default_insert_set, Config().default_postgres_lines_read, Config().default_postgres_last_file_read, postgres)
                 os.system('clear')
-                print("Doctors - MedicalRecords:")
+                (lambda current_iteration, total_iterations: print("Doctors - MedicalRecords:") if total_iterations == 0 else print("Doctors - MedicalRecords:   (batch "+str(current_iteration)+"/"+str(total_iterations)+")"))(current_iteration, total_iterations)
                 (requested_rows, default_insert_set,Config().default_postgres_lines_read,Config().default_postgres_last_file_read) = load_sql_content("Doctor_MedicalRecords", requested_rows, default_insert_set, Config().default_postgres_lines_read, Config().default_postgres_last_file_read, postgres)
             else:
                 os.system('clear')
@@ -67,7 +69,7 @@ def load_sql_content(element:str, requested_rows:int, default_insert_set:int, de
     """This function iterates over data files until all requested rows are gathered and then inserts them into the database"""
 
     try:
-        current_file_row = default_postgres_lines_read - (default_postgres_last_file_read* default_insert_set)
+        current_file_row = default_postgres_lines_read - ( (default_postgres_last_file_read - 1) * default_insert_set)
                 
         content_sql = ""        
         pending_rows = requested_rows
