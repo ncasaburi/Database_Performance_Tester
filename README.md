@@ -1,4 +1,4 @@
-# Database Performance Test
+# Database Performance Tester
 ## Developers
  
 * Casaburi, Nicolas
