@@ -5,16 +5,21 @@ from src.config.Config import Config
 from src.generator.CustomFaker import CustomFaker
 from tqdm import tqdm
 import time
+import fnmatch
+import os
+import re
 
 class DataGenerator():
 
-    def __init__(self, default_insert_set:int=10000, default_insert_files:int=10, SQL_enable:bool=True, MQL_enable:bool=True) -> None:
+    def __init__(self, default_insert_set:int=10000, default_insert_files:int=10, SQL_enable:bool=True, MQL_enable:bool=True, last_set_number:int=0) -> None:
         """This function initializes the DataGenerator class"""
 
         try:
             self._default_insert_set = default_insert_set
             self._default_insert_files = default_insert_files
 
+            self._last_set_number = last_set_number + 1
+            
             self._SQL_enable = SQL_enable
             self._MQL_enable = MQL_enable
             self._custom_facker = CustomFaker("en_US", 42)
@@ -79,13 +84,13 @@ class DataGenerator():
             sets = lambda: "sets" if self.default_insert_files > 1 else "set"
             SingleLogger().logger.info(f"Generating data with {int(self.default_insert_set*self.default_insert_files)} patients and splitting them into {self.default_insert_files}...")
             start_counter = time.time()
-            for i1 in tqdm(range(self.default_insert_files), desc="Generating "+str(self.default_insert_files)+" "+sets()+" of "+str(self.default_insert_set)+" patients", ascii=' #'):
+            for i1 in tqdm(range(self._last_set_number, self._last_set_number + self.default_insert_files), desc="Generating "+str(self.default_insert_files)+" "+sets()+" of "+str(self.default_insert_set)+" patients", ascii=' #'):
 
                 patients = []
                 patients_sql = []
                 patients_mql = []
                 for i2 in tqdm(range(self.default_insert_set), desc="  Creating "+str(self.default_insert_set)+" patients", ascii=' #', leave=False):
-                    patient = self._create_patient(i2 + 1 + (i1 * self.default_insert_set))
+                    patient = self._create_patient(i2 + 1 + ( (i1 - 1 ) * self.default_insert_set))
                     patients.append(patient)
                     if self.SQL_enable:
                         patients_sql.append(f"INSERT INTO patients (id_patient, name, surname, birthday, gender, address, city, state, phone) VALUES ('{patient['id_patient']}','{patient['name']}', '{patient['surname']}', '{patient['birthday']}', '{patient['gender']}', '{patient['address']}', '{patient['city']}', '{patient['state']}', '{patient['phone']}');")
@@ -115,13 +120,13 @@ class DataGenerator():
             sets = lambda: "sets" if self.default_insert_files > 1 else "set"
             SingleLogger().logger.info(f"Generating data with {int(self.default_insert_set*self.default_insert_files)} doctors and splitting them into {self.default_insert_files}...")
             start_counter = time.time()                                                                 
-            for i1 in tqdm(range(self.default_insert_files), desc="Generating "+str(self.default_insert_files)+" "+sets()+" of "+str(self.default_insert_set)+" doctors", ascii=' #'):
+            for i1 in tqdm(range(self._last_set_number, self._last_set_number + self.default_insert_files), desc="Generating "+str(self.default_insert_files)+" "+sets()+" of "+str(self.default_insert_set)+" doctors", ascii=' #'):
         
                 doctors = []
                 doctors_sql = []
                 doctors_mql = []
                 for i2 in tqdm(range(self.default_insert_set), desc="  Generating "+str(self.default_insert_set)+" doctors", ascii=' #', leave=False):
-                    doctor = self._create_doctor(i2 + 1 + (i1 * self.default_insert_set))
+                    doctor = self._create_doctor(i2 + 1 + ( (i1 - 1 ) * self.default_insert_set))
                     doctors.append(doctor)
                     if self.SQL_enable:
                         doctors_sql.append(f"INSERT INTO doctors (id_doctor, name, surname, profession) VALUES ('{doctor['id_doctor']}','{doctor['name']}', '{doctor['surname']}', '{doctor['profession']}');")
@@ -151,7 +156,7 @@ class DataGenerator():
             sets = lambda: "sets" if self.default_insert_files > 1 else "set"
             SingleLogger().logger.info(f"Generating data with {int(self.default_insert_set*self.default_insert_files)} doctors and splitting them into {self.default_insert_files}...")
             start_counter = time.time()                                                                 
-            for i1 in tqdm(range(self.default_insert_files), desc="Generating "+str(self.default_insert_files)+" "+sets()+" of "+str(self.default_insert_set)+" doctor medical records", ascii=' #'):
+            for i1 in tqdm(range(self._last_set_number, self._last_set_number + self.default_insert_files), desc="Generating "+str(self.default_insert_files)+" "+sets()+" of "+str(self.default_insert_set)+" doctor medical records", ascii=' #'):
 
                 medicalrecords = []
                 medicalrecords_sql = []
@@ -159,10 +164,10 @@ class DataGenerator():
                 doctor_medicalrecords_sql = []
                 doctor_medicalrecords_mql = []
                 for i2 in tqdm(range(self.default_insert_set), desc="  Generating "+str(self.default_insert_set)+" medical records", ascii=' #', leave=False):
-                    record = self._create_medical_record(i2 + 1 + (i1 * self.default_insert_set))
-                    record_dmr = f"INSERT INTO doctor_medical_records (id_doctor, id_medical_record) VALUES ('{i2 + 1 + (i1 * self.default_insert_set)}','{record['id_medical_record']}');"
+                    record = self._create_medical_record(i2 + 1 + ( (i1 - 1 ) * self.default_insert_set))
+                    record_dmr = f"INSERT INTO doctor_medical_records (id_doctor, id_medical_record) VALUES ('{i2 + 1 + ( (i1 - 1 ) * self.default_insert_set)}','{record['id_medical_record']}');"
                     doctor_medicalrecords_sql.append(record_dmr)
-                    doctor_medicalrecords_mql.append(f"{{'id_doctor': {i2 + 1 + (i1 * self.default_insert_set)}, 'id_medicalrecord': {i2 + 1 + (i1 * self.default_insert_set)}}}")
+                    doctor_medicalrecords_mql.append(f"{{'id_doctor': {i2 + 1 + ( (i1 - 1 ) * self.default_insert_set)}, 'id_medicalrecord': {i2 + 1 + ( (i1 - 1 ) * self.default_insert_set)}}}")
                     medicalrecords.append(record)
                     medicalrecords_sql.append(f"INSERT INTO medical_records (id_medical_record, id_patient, admission_date, discharge_date, diagnosis, treatment, test_results) VALUES ({record['id_medical_record']}, {record['id_patient']},'{record['admission_date']}', '{record['discharge_date']}', '{record['diagnosis']}', '{record['treatment']}', '{record['test_result']}');")
                     medicalrecords_mql.append({key: value if key != 'admission_date' and key != 'discharge_date' else value.strftime('%Y-%m-%d') for key, value in record.items()})
@@ -191,6 +196,71 @@ class DataGenerator():
             del doctor_medicalrecords_mql
         except:
             SingleLogger().logger.exception("Error while generating medical records with DataGenerator", exc_info=True)
+    
+    def update_config(self, number_of_files:int=0):
+        """This function updates the config values with the new numbers of items per sets and number of files"""
+
+        try:
+            Config().option_create_modify("Memory","default_insert_set",str(self._default_insert_set))
+            if number_of_files == 0:
+                Config().option_create_modify("Memory","default_insert_files",str(self._default_insert_files))
+            else:
+                Config().option_create_modify("Memory","default_insert_files",str(number_of_files))
+        except:
+            SingleLogger().logger.exception("Error while updating config file on DataGenerator", exc_info=True)
+
+    def check_previous_sets(self):
+        """List all files in a directory that match a given pattern"""
+
+        try:
+            sets = {}
+
+            # First check for doctors
+
+            for root, dirs, files in os.walk(self._postgres_doctors_path):
+                for filename in files:
+                    if re.match(r'\d+_(doctors)_set\d+\.zip', filename):
+                        rows_per_set = re.match(r'^(\d+)_', filename).group(1)
+                        if rows_per_set:
+                            if str(rows_per_set) in sets:
+                                sets[str(rows_per_set)].append(str(filename))
+                            else:
+                                sets.update({str(rows_per_set): [str(filename)]})
+            
+            sets = self.get_common_filenames(self._mongo_doctors_path,"doctors", sets)
+            sets = self.get_common_filenames(self._postgres_patients_path,"patients", sets)
+            sets = self.get_common_filenames(self._mongo_patients_path,"patients", sets)
+            sets = self.get_common_filenames(self._postgres_medicalrecords_path,"medicalrecords", sets)
+            sets = self.get_common_filenames(self._mongo_medicalrecords_path,"medicalrecords", sets)
+            sets = self.get_common_filenames(self._postgres_doctor_medicalrecords_path,"doctor_medicalrecords", sets)
+
+            return sets
+        except:
+            SingleLogger().logger.exception("Error while checking previous sets on DataGenerator", exc_info=True)
+    
+    def get_common_filenames(self, path, entity, previous_dict):
+        """This function return a dictionary with the datasets available"""
+        
+        try:
+            temp_dict = {}
+
+            for root, dirs, files in os.walk(path):
+                for filename in files:
+                    if re.match(r'\d+_('+entity+')_set\d+\.zip', filename):
+                        rows_per_set = re.match(r'^(\d+)_', filename).group(1)
+                        if rows_per_set and rows_per_set in previous_dict:
+                            if str(rows_per_set) in temp_dict:
+                                temp_dict[str(rows_per_set)].append(str(filename))
+                            else:
+                                temp_dict.update({str(rows_per_set): [str(filename)]})
+
+            for key, value in temp_dict.items():
+                if not len(value) == len(previous_dict[key]):
+                    del temp_dict[key]
+
+            return temp_dict
+        except:
+            SingleLogger().logger.exception("Error while getting common filenames on DataGenerator", exc_info=True)
 
     @property
     def SQL_enable(self) -> bool:

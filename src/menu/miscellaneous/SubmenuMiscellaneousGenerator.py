@@ -2,6 +2,7 @@ from consolemenu import *
 from consolemenu.items import *
 from src.logic.status import status
 from src.logic.miscellaneous.miscellaneous_generator import miscellaneous_generator_fn
+from src.menu.miscellaneous.SubmenuMiscellaneousGeneratorBoth import SubmenuMiscellaneousGeneratorBoth
 
 class SubmenuMiscellaneousGenerator():
 
@@ -12,7 +13,8 @@ class SubmenuMiscellaneousGenerator():
         self.submenu_miscellaneous_generator = ConsoleMenu("Data Generator", status)
         
         #submenu items
-        miscellaneous_generator_both = FunctionItem("Generate data to populate both SQL and NoSQL databases", miscellaneous_generator_fn, args=[True,True]) 
+        # miscellaneous_generator_both = FunctionItem("Generate data to populate both SQL and NoSQL databases", miscellaneous_generator_fn, args=[True,True]) 
+        miscellaneous_generator_both = SubmenuItem("Generate data to populate both SQL and NoSQL databases", SubmenuMiscellaneousGeneratorBoth().get(), self.submenu_miscellaneous_generator)
         miscellaneous_generator_sql = FunctionItem("Generate data to populate SQL databases", miscellaneous_generator_fn, args=[True,False])
         miscellaneous_generator_mql = FunctionItem("Generate data to populate NoSQL databases", miscellaneous_generator_fn, args=[False,True])
 
