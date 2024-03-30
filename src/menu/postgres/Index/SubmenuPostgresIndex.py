@@ -12,8 +12,8 @@ class SubmenuPostgresIndex():
         self.submenu_postgres_index_create = ConsoleMenu("PostgreSQL Index Creates", status)
         
         #submenu items
-        postgres_index_create_default = FunctionItem("Create default indexs", postgres_index_create_fn, args=["default"]) 
-        postgres_index_create_custom = FunctionItem("Create custom indexs", postgres_index_create_fn, args=["custom"])
+        postgres_index_create_default = FunctionItem("Create default indexes", postgres_index_create_fn, args=["default"]) 
+        postgres_index_create_custom = FunctionItem("Create custom indexes", postgres_index_create_fn, args=["custom"])
 
         #submenu appends
         self.submenu_postgres_index_create.append_item(postgres_index_create_default)

@@ -9,9 +9,9 @@ def postgres_index_create_fn(type:str):
     try:
         postgres = PostgreSQL()
         if type == "default":
-            print("Creating default indexs...")
-            content_sql = Zipper().unzip_content(Config().default_data["default_postgres_indexs"]+"Indexs.zip","sql")
-            postgres.run_query(content_sql, "Creating default indexs...")
+            print("Creating default indexes...")
+            content_sql = Zipper().unzip_content(Config().default_data["default_postgres_indexes"]+"Indexes.zip","sql")
+            postgres.run_query(content_sql, "Creating default indexes...")
         else:
             print("Enter the table creation query: \nExample: CREATE INDEX indexname ON tablename ( columnname1, columname2 ...);")
             query = input()
