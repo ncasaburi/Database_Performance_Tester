@@ -18,7 +18,7 @@ class SubmenuPostgres():
         postgres_database = SubmenuItem("Database", SubmenuPostgresDatabase().get(), menu=self.submenu_postgres)
         postgres_tables = SubmenuItem("Tables", SubmenuPostgresTable().get(), menu=self.submenu_postgres)
         postgres_rows = SubmenuItem("Rows", SubmenuPostgresRow().get(), menu=self.submenu_postgres)
-        postgres_indexs = SubmenuItem("Indexs", SubmenuPostgresIndex().get(), menu=self.submenu_postgres)
+        postgres_indexs = SubmenuItem("Indexes", SubmenuPostgresIndex().get(), menu=self.submenu_postgres)
         postgres_files = SubmenuItem("Files", self.submenu_postgres, menu=self.submenu_postgres)
 
         #submenu appends
