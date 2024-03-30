@@ -24,8 +24,7 @@ def database_check(db, default_database_autoconnect:bool, default_connection_str
         current_stauts = db().status()
 
         if current_stauts == "Disconnected":
-            # if default_database_autoconnect == True and db().exist(default_connection_string,default_database_name):
-            if default_database_autoconnect == True:
+            if default_database_autoconnect == True and db().exist(default_connection_string,default_database_name):
                 db().connect(default_connection_string,default_database_name)
                 current_stauts = db().status()
 

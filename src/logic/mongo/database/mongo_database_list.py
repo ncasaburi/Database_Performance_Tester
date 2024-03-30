@@ -12,7 +12,7 @@ def mongo_database_list_fn() -> None:
         print("Databases:\n")
         for db in list_databases:
             print(" - "+db)
-            print("\nPress enter to continue...")
-            input()
+        print("\nPress enter to continue...")
+        input()
     except:
         SingleLogger().logger.exception("Error while listing MongoDB databases", exc_info=True)

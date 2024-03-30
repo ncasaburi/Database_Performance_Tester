@@ -5,9 +5,9 @@ class Config():
     _config = None
     _config_file = None
     _default_postgres_lines_read = 0
-    _default_postgres_last_file_read = 0
+    _default_postgres_last_file_read = 1
     _default_mongo_lines_read = 0
-    _default_mongo_last_file_read = 0
+    _default_mongo_last_file_read = 1
 
     def __new__(cls):
 

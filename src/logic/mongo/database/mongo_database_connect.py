@@ -8,13 +8,14 @@ def mongo_database_connect_fn(type:str):
     """This function allows the user to connect to a MongoDB database"""
 
     try:
+        mongo = MongoDB()
         if type == "default":
-            MongoDB().connect(Config().default_dbs["default_mongo_connection_string"],Config().default_dbs["default_database_name"])
+            mongo.connect(Config().default_dbs["default_mongo_connection_string"],Config().default_dbs["default_database_name"])
         else:
             print("Enter the connection string: (example: mongodb://user:password@localhost:27017/)")
             mongo_connection_string = input()
             print("Enter the database name:")
             db_name = input()
-            MongoDB().connect(mongo_connection_string,db_name)
+            mongo.connect(mongo_connection_string,db_name)
     except:
         SingleLogger().logger.exception("Error while connecting to a MongoDB database", exc_info=True)
