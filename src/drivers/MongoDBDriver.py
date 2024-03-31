@@ -27,7 +27,7 @@ class MongoDB():
             else:
                 return "Disconnected"
         except Exception:
-            SingleLogger().logger.exception("Error while getting MongoDB connection status", exc_info=True)
+            SingleLogger().logger.exception("MongoDB: Error while getting connection status", exc_info=True)
             sys.exit(1)
 
     def exist(self, db_connection_string, db_name):
@@ -35,16 +35,16 @@ class MongoDB():
 
         try:
             if not db_name == "":
-                SingleLogger().logger.info("Checking Mongo database "+db_name+" existence...")
+                SingleLogger().logger.info("MongoDB: Checking database "+db_name+" existence")
                 client_temp = MongoClient(db_connection_string)
                 list_databases = client_temp.list_database_names()
                 if db_name in list_databases:   
-                    SingleLogger().logger.info("Mongo database "+db_name+" already exists")
+                    SingleLogger().logger.info("MongoDB: Database "+db_name+" already exists")
                     client_temp.close()
                     del client_temp
                     return True
                 else:
-                    SingleLogger().logger.info("Mongo database "+db_name+" doesn't exists")
+                    SingleLogger().logger.info("MongoDB: Database "+db_name+" doesn't exists")
                     return False
             else:
                 try:
@@ -53,30 +53,27 @@ class MongoDB():
                     del client_temp
                     return True
                 except Exception:
-                    SingleLogger().logger.info("The connection with "+db_connection_string+" couldn't be established")
+                    SingleLogger().logger.info("MongoDB: The connection with "+db_connection_string+" couldn't be established")
                     return False    
         except Exception:
-            SingleLogger().logger.info("Mongo database "+db_name+" doesn't exists")
+            SingleLogger().logger.exception("MongoDB: Database "+db_name+" doesn't exists")
             return False          
 
     def create(self, db_connection_string, db_name):
         """This function creates a database on MongoDB"""
 
         try:
-            SingleLogger().logger.info("Creating database "+db_name+" on MongoDB...")
+            SingleLogger().logger.info("MongoDB: Creating database "+db_name)
             self.close()
             if not self.exist(db_connection_string, db_name):
                 start_counter = time.time()
                 self.connect(db_connection_string,db_name)
                 self.create_collection("test")
                 stop_counter = time.time()
-                server_status = self.db.command('serverStatus')
-                resident_memory_mb = server_status['mem']['resident']
-                virtual_memory_mb = server_status['mem']['virtual']
-                SingleLogger().logger.info("Database "+db_name+" created")
-                SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB")    
+                resident_memory , virtual_memory = self.get_memory_status()
+                SingleLogger().logger.info(f"MongoDB: Done! Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory} MB, Virtual memory: {virtual_memory} MB")    
         except Exception:
-            SingleLogger().logger.exception("Error while connecting to MongoDB", exc_info=True)
+            SingleLogger().logger.exception("MongoDB: Error while connecting", exc_info=True)
             sys.exit(1)
 
     def connect(self, db_connection_string, db_name):
@@ -84,135 +81,122 @@ class MongoDB():
 
         try:
             self.close()
-            SingleLogger().logger.info("Connecting to "+db_connection_string+db_name+" on MongoDB...")
+            SingleLogger().logger.info("MongoDB: Connecting to "+db_connection_string+db_name)
             start_counter = time.time()
             self.client = MongoClient(db_connection_string)
             self.db = self.client[db_name]
             stop_counter = time.time()
-            server_status = self.db.command('serverStatus')
-            resident_memory_mb = server_status['mem']['resident']
-            virtual_memory_mb = server_status['mem']['virtual']
-            SingleLogger().logger.info("Connection with "+db_connection_string+db_name+" has been established")
-            SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB")
+            resident_memory , virtual_memory = self.get_memory_status()
+            SingleLogger().logger.info(f"MongoDB: Done! Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory} MB, Virtual memory: {virtual_memory} MB")
             self.__connection_string = db_connection_string
         except Exception as error:
-            SingleLogger().logger.exception("Error while connecting to "+db_connection_string+db_name+" on MongoDB", exc_info=True)
+            SingleLogger().logger.exception("MongoDB: Error while connecting to "+db_connection_string+db_name, exc_info=True)
             sys.exit(1)
 
-    def execute_query_update(self, collection_name, query_update, update):
+    def execute_query_update(self, collection_name, query_update, update, description:str=""):
         """This function updates documents on a MongoDB collection"""
 
         try:
+            if not description == "":
+                SingleLogger().logger.info(f"MongoDB: {description}")
             collection = self.db[collection_name]
-            SingleLogger().logger.info("Updating documents in collection: "+collection_name)
             start_counter = time.time()
             result = collection.update_many(query_update,update)
             stop_counter = time.time()
-            server_status = self.db.command('serverStatus')
-            resident_memory_mb = server_status['mem']['resident']
-            virtual_memory_mb = server_status['mem']['virtual']
-            SingleLogger().logger.info("Total documents updated: " + str(result.modified_count))
-            SingleLogger().logger.info("Query executed successfully.")
-            SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB")
+            resident_memory , virtual_memory = self.get_memory_status()
+            SingleLogger().logger.info("MongoDB: Total documents updated: " + str(result.modified_count))
+            SingleLogger().logger.info(f"MongoDB: Done! Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Collection: {collection_name} Space occupied: {self.collection_space_occupied(collection_name)} MB, Resident memory: {resident_memory} MB, Virtual memory: {virtual_memory} MB")
             return result
         except Exception as error:
-            SingleLogger().logger.exception("Error while updating documents on MongoBD", exc_info=True)
+            SingleLogger().logger.exception("MongoDB: Error while updating documents", exc_info=True)
             return None
         
-    def execute_query_delete(self, collection_name, query_delete):
+    def execute_query_delete(self, collection_name, query_delete, description:str=""):
         """This function deletes documents from a MongoDB collection"""
 
         try:
+            if not description == "":
+                SingleLogger().logger.info(f"MongoDB: {description}")
             collection = self.db[collection_name]
-            SingleLogger().logger.info("Deleting documents in collection: "+collection_name)
             start_counter = time.time()
             result = collection.delete_many(query_delete)
             stop_counter = time.time()
-            server_status = self.db.command('serverStatus')
-            resident_memory_mb = server_status['mem']['resident']
-            virtual_memory_mb = server_status['mem']['virtual']
-            SingleLogger().logger.info("Total documents deleted: " + str(result.deleted_count))
-            SingleLogger().logger.info("Query executed successfully.")
-            SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB")
+            resident_memory , virtual_memory = self.get_memory_status()
+            SingleLogger().logger.info("MongoDB: Total documents deleted: " + str(result.deleted_count))
+            SingleLogger().logger.info(f"MongoDB: Done! Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Collection: {collection_name} Space occupied: {self.collection_space_occupied(collection_name)} MB, Resident memory: {resident_memory} MB, Virtual memory: {virtual_memory} MB")
             return result
         except Exception as error:
-            SingleLogger().logger.exception("Error while deleting documents on MongoDB", exc_info=True)
+            SingleLogger().logger.exception("MongoDB: Error while deleting documents", exc_info=True)
             return None
 
-    def execute_query_find(self, collection_name, query:dict):
+    def execute_query_find(self, collection_name, query:dict, description:str=""):
         """This function executy a query to find documents"""
 
         try:
+            if not description == "":
+                SingleLogger().logger.info(f"MongoDB: {description}")
             collection = self.db[collection_name]
-            SingleLogger().logger.info("Executing find in collection: " + collection_name)
             start_counter = time.time()
             result = collection.find(query)
             stop_counter = time.time()
-            server_status = self.db.command('serverStatus')
-            resident_memory_mb = server_status['mem']['resident']
-            virtual_memory_mb = server_status['mem']['virtual']
-            SingleLogger().logger.info("Number of documents found " + str(self.count_documents(collection_name)))
-            SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB")
+            resident_memory , virtual_memory = self.get_memory_status()
+            SingleLogger().logger.info("MongoDB: Number of documents found " + str(self.count_documents(collection_name)))
+            SingleLogger().logger.info(f"MongoDB: Done! Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Collection: {collection_name} Space occupied: {self.collection_space_occupied(collection_name)} MB, Resident memory: {resident_memory} MB, Virtual memory: {virtual_memory} MB")
             return list(result)
         except Exception as error:
-            SingleLogger().logger.exception("Error while executing find query", exc_info=True)
+            SingleLogger().logger.exception("MongoDB: Error while executing find query", exc_info=True)
             return None
 
-    def execute_query_insert(self, collection_name:str, query_insert:str):
+    def execute_query_insert(self, collection_name:str, query_insert:str, description:str=""):
         """This function inserts documents into a MongoDB collection"""
 
         try:           
-            SingleLogger().logger.info("Inserting documents into collection: "+collection_name+" on MongoDB...")
+            if not description == "":
+                SingleLogger().logger.info(f"MongoDB: {description}")
             collection = self.db[collection_name]
             documents = json.loads(query_insert)
             start_counter = time.time()
             result = collection.insert_many(documents)
             stop_counter = time.time()
-            server_status = self.db.command('serverStatus')
-            resident_memory_mb = server_status['mem']['resident']
-            virtual_memory_mb = server_status['mem']['virtual']
-            SingleLogger().logger.info("Number of documents inserted: " + str(len(result.inserted_ids)))            
-            SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB, Collection: {collection_name} space occupied: {self.collection_space_occupied(collection_name)} MB")
+            resident_memory , virtual_memory = self.get_memory_status()
+            SingleLogger().logger.info("MongoDB: Number of documents inserted: " + str(len(result.inserted_ids)))            
+            SingleLogger().logger.info(f"MongoDB: Done! Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Collection: {collection_name} Space occupied: {self.collection_space_occupied(collection_name)} MB, Resident memory: {resident_memory} MB, Virtual memory: {virtual_memory} MB")
             return result
         except Exception as error:
-            SingleLogger().logger.exception("Error while inserting documents on MongoDB", exc_info=True)
+            SingleLogger().logger.exception("MongoDB: Error while inserting documents", exc_info=True)
             sys.exit(1)
 
-    def execute_aggregate(self, collection_name,pipeline):
+    def execute_aggregate(self, collection_name, pipeline, description:str=""):
         """This function performs an aggregation of documents on a MongoDB collection"""
 
         try:
-            SingleLogger().logger.info("Executing aggregate on collection: "+collection_name+" on MongoDB...")
+            if not description == "":
+                SingleLogger().logger.info(f"MongoDB: {description}")
             collection = self.db[collection_name]
             start_counter = time.time()
             result = collection.aggregate(pipeline)
             stop_counter = time.time()
-            server_status = self.db.command('serverStatus')
-            resident_memory_mb = server_status['mem']['resident']
-            virtual_memory_mb = server_status['mem']['virtual']
-            SingleLogger().logger.info("Aggregation executed successfully.")
-            SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB")
+            resident_memory , virtual_memory = self.get_memory_status()
+            SingleLogger().logger.info(f"MongoDB: Done! Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Collection: {collection_name} Space occupied: {self.collection_space_occupied(collection_name)} MB, Resident memory: {resident_memory} MB, Virtual memory: {virtual_memory} MB")
             return list(result)
         except Exception as error:
-            SingleLogger().logger.exception("Error while performing aggregation of documents on MongoDB", exc_info=True)
+            SingleLogger().logger.exception("MongoDB: Error while performing aggregation of documents", exc_info=True)
             sys.exit(1)
     
-    def create_index(self, collection_name, index):
+    def create_index(self, collection_name, index, description:str=""):
         """This function creates an index on a MongoDB collection"""    
 
         try:
-            SingleLogger().logger.info("Creating index on collection: "+collection_name+" on MongoDB...")
+            if not description == "":
+                SingleLogger().logger.info(f"MongoDB: {description}")
             collection = self.db[collection_name]
             start_counter = time.time()
             collection.create_index(index)
             stop_counter = time.time()
-            server_status = self.db.command('serverStatus')
-            resident_memory_mb = server_status['mem']['resident']
-            virtual_memory_mb = server_status['mem']['virtual']
-            SingleLogger().logger.info("Index creation executed successfully.")
-            SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB")
+            resident_memory , virtual_memory = self.get_memory_status()
+            SingleLogger().logger.info(f"MongoDB: Done! Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Collection: {collection_name} Space occupied: {self.collection_space_occupied(collection_name)} MB, Resident memory: {resident_memory} MB, Virtual memory: {virtual_memory} MB")
         except Exception as error:
-            SingleLogger().logger.exception("Error while creating an index on a MongoDB collection", exc_info=True)
+            SingleLogger().logger.exception("MongoDB: Error while creating an index on a collection", exc_info=True)
             sys.exit(1)
 
         
@@ -224,14 +208,15 @@ class MongoDB():
             result = collection.count_documents(filter)
             return result
         except Exception as error:
-            SingleLogger().logger.exception("Error while counting documents on MongoDB", exc_info=True)
+            SingleLogger().logger.exception("MongoDB: Error while counting documents", exc_info=True)
             sys.exit(1)
 
-    def drop(self, db_connection_string, db_name):
+    def drop(self, db_connection_string, db_name, description:str=""):
         """This function drops a MongoDB database"""
         
         try:
-            SingleLogger().logger.info("Dropping the database "+db_name+" from MongoDB...")
+            if not description == "":
+                SingleLogger().logger.info(f"MongoDB: {description}")
             previous_db = None
             previous_connection_string = None
             if not (self.status() == "Disconnected") and not (self.status() == db_name):
@@ -241,18 +226,16 @@ class MongoDB():
             start_counter = time.time()
             self.client.drop_database(db_name)
             stop_counter = time.time()
-            server_status = self.db.command('serverStatus')
-            resident_memory_mb = server_status['mem']['resident']
-            virtual_memory_mb = server_status['mem']['virtual']
-            SingleLogger().logger.info("The database "+db_name+" has been dropped")
-            SingleLogger().logger.info(f"Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Resident memory: {resident_memory_mb} MB, Virtual memory: {virtual_memory_mb} MB")
+            resident_memory , virtual_memory = self.get_memory_status()
+            SingleLogger().logger.info("MongoDB: The database "+db_name+" has been dropped")
+            SingleLogger().logger.info(f"MongoDB: Done! Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Collection: {collection_name} Space occupied: {self.collection_space_occupied(collection_name)} MB, Resident memory: {resident_memory} MB, Virtual memory: {virtual_memory} MB")
             self.close()
             if not (previous_connection_string == None) and not (previous_db == None):
                 self.connect(previous_connection_string,previous_db)
             del previous_connection_string
             del previous_db
         except Exception:
-            SingleLogger().logger.exception("Error while dropping database on MongoDB", exc_info=True)
+            SingleLogger().logger.exception("MongoDB: Error while dropping database on MongoDB", exc_info=True)
             sys.exit(1)
 
     def create_collection(self, collection_name):
@@ -260,10 +243,10 @@ class MongoDB():
         
         try:
             self.db[collection_name]
-            SingleLogger().logger.info("Collection "+collection_name+" created successfully.")
+            SingleLogger().logger.info("MongoDB: Collection "+collection_name+" created successfully.")
             return True
         except Exception as error:
-            SingleLogger().logger.exception("Error while creating "+collection_name+" collection on MongoDB", exc_info=True)
+            SingleLogger().logger.exception("MongoDB: Error while creating "+collection_name+" collection on MongoDB", exc_info=True)
             return False
 
     def drop_collection(self, collection_name):
@@ -271,26 +254,38 @@ class MongoDB():
 
         try:
             self.db.drop_collection(collection_name)
-            SingleLogger().logger.info("Collection "+collection_name+" dropped successfully.")
+            SingleLogger().logger.info("MongoDB: Collection "+collection_name+" dropped successfully.")
             return True
         except Exception as error:
-            SingleLogger().logger.exception("Error while dropping the collection "+collection_name+" on MongoDB", exc_info=True)
+            SingleLogger().logger.exception("MongoDB: Error while dropping the collection "+collection_name+" on MongoDB", exc_info=True)
             return False
 
     def exist_collection(self, collection_name):
         """This function checks whether the collection exists or not"""
 
         try:
-            SingleLogger().logger.info("Checking collection "+collection_name+" existence...")
+            SingleLogger().logger.info("MongoDB: Checking collection "+collection_name+" existence")
             collections = self.db.list_collection_names() # Llamar al método para obtener la lista de colecciones
             if collections is not None and collection_name in collections:   
                 SingleLogger().logger.info("Collection "+collection_name+" already exists")
                 return True
             else:
-                SingleLogger().logger.info("Collection "+collection_name+" doesn't exist")
+                SingleLogger().logger.info("MongoDB: Collection "+collection_name+" doesn't exist")
                 return False   
         except Exception:
-            SingleLogger().logger.exception("Error while checking MongoDB collection existence", exc_info=True)
+            SingleLogger().logger.exception("MongoDB: Error while checking MongoDB collection existence", exc_info=True)
+            sys.exit(1)
+
+    def get_memory_status(self) -> list:
+        """This function returns the memory usage values for resident as well as virtual memory"""
+
+        try:
+            server_status = self.db.command('serverStatus')
+            resident_memory_mb = server_status['mem']['resident']
+            virtual_memory_mb = server_status['mem']['virtual']
+            return (resident_memory_mb, virtual_memory_mb)
+        except Exception:
+            SingleLogger().logger.exception("MongoDB: Error while getting memory usage on MongoDB", exc_info=True)
             sys.exit(1)
 
     def collection_space_occupied(self, collection_name):
@@ -300,7 +295,7 @@ class MongoDB():
             storage_size = self.db.command("collStats", collection_name)["storageSize"]
             return round( storage_size / (1024 * 1024), 3)
         except Exception:
-            SingleLogger().logger.exception("Error while getting space occupied by the collection: "+str(collection_name), exc_info=True)
+            SingleLogger().logger.exception("MongoDB: Error while getting space occupied by the collection: "+str(collection_name), exc_info=True)
             sys.exit(1)
 
     def get_attribute_names(self, collection_name):
@@ -314,7 +309,7 @@ class MongoDB():
             else:
                 return []
         except Exception:
-            SingleLogger().logger.exception("Error while getting the attribute names of the collection: "+str(collection_name), exc_info=True)
+            SingleLogger().logger.exception("MongoDB: Error while getting the attribute names of the collection: "+str(collection_name), exc_info=True)
             sys.exit(1)
 
     @property
@@ -335,7 +330,7 @@ class MongoDB():
             if hasattr(self, 'db'):
                 del self.db
             self.__connection_string = None
-            SingleLogger().logger.info("Connection closed")
+            SingleLogger().logger.info("MongoDB: Connection closed")
         except Exception:
-            SingleLogger().logger.exception("Error while closing MongoDB cursor and connection", exc_info=True)
+            SingleLogger().logger.exception("MongoDB: Error while closing MongoDB cursor and connection", exc_info=True)
             sys.exit(1)
