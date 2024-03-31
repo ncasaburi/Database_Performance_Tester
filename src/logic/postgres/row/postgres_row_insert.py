@@ -14,10 +14,10 @@ def postgres_row_insert_fn(type:str, requested_rows:int=0, current_iteration:int
             default_number_files = int(Config().default_memory["default_insert_files"])
 
             if requested_rows == 0:
-                actual_doctor_rows = postgres.run_query("SELECT COUNT(*) FROM doctors","",expected_result=True)[0][0]
-                actual_patient_rows = postgres.run_query("SELECT COUNT(*) FROM patients","",expected_result=True)[0][0]
-                actual_medicalrecord_rows = postgres.run_query("SELECT COUNT(*) FROM medical_records","",expected_result=True)[0][0]
-                actual_doctormedicalrecord_rows = postgres.run_query("SELECT COUNT(*) FROM doctor_medical_records","",expected_result=True)[0][0]
+                actual_doctor_rows = postgres.run_query("SELECT COUNT(*) FROM doctors","Calculating the number of rows in the doctors' table",expected_result=True)[0][0]
+                actual_patient_rows = postgres.run_query("SELECT COUNT(*) FROM patients","Calculating the number of rows in the patients' table",expected_result=True)[0][0]
+                actual_medicalrecord_rows = postgres.run_query("SELECT COUNT(*) FROM medical_records","Calculating the number of rows in the medical_records' table",expected_result=True)[0][0]
+                actual_doctormedicalrecord_rows = postgres.run_query("SELECT COUNT(*) FROM doctor_medical_records","Calculating the number of rows in the doctor_medical_records' table",expected_result=True)[0][0]
                 if actual_doctor_rows == 0 and actual_patient_rows == 0 and actual_medicalrecord_rows == 0 and actual_doctormedicalrecord_rows == 0:
                     Config().default_postgres_lines_read = 0
                     Config().default_postgres_last_file_read = 1
@@ -58,12 +58,12 @@ def postgres_row_insert_fn(type:str, requested_rows:int=0, current_iteration:int
             query = input()
             query = query.lower()
             if query.startswith("insert into"):
-                postgres.run_query(query, "Inserting custom rows...")
+                postgres.run_query(query, "Inserting custom rows")
             else:
                 print("\nThe query must begin with INSERT INTO")
                 input("\nPress enter to go back to the menu")
     except:
-        SingleLogger().logger.exception("Error while inserting rows to PostgreSQL", exc_info=True)
+        SingleLogger().logger.exception("PostgreSQL: Error while inserting rows", exc_info=True)
 
 def load_sql_content(element:str, requested_rows:int, default_insert_set:int, default_postgres_lines_read, default_postgres_last_file_read, postgres) -> list:
     """This function iterates over data files until all requested rows are gathered and then inserts them into the database"""
@@ -105,8 +105,8 @@ def load_sql_content(element:str, requested_rows:int, default_insert_set:int, de
             pending_rows = 0                
         #Inserting rows
         print("  inserting rows...")
-        postgres.run_query(content_sql,"Adding "+str(len(content_sql.splitlines()))+" "+element.lower()+"...")
+        postgres.run_query(content_sql,"Adding "+str(len(content_sql.splitlines()))+" "+element.lower())
         return (requested_rows,default_insert_set,default_postgres_lines_read,default_postgres_last_file_read)
     except:
-        SingleLogger().logger.exception("Error while loading sql content for PostgreSQL", exc_info=True)
+        SingleLogger().logger.exception("PostgreSQL: Error while loading sql content", exc_info=True)
 

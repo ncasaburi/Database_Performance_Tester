@@ -11,7 +11,7 @@ def postgres_row_select_fn(type:str):
             print("The following query is going to be executed:\n")
             query = "SELECT * FROM doctors WHERE id_doctor BETWEEN 1 AND 5"
             print("  "+query)
-            result = postgres.run_query(query,"Executing default select on PostgreSQL...", True)
+            result = postgres.run_query(query,"Executing default select", True)
             print("\nResult:\n")
             print("  "+'\n  '.join(map(str, result)))
             print("\n\nPress enter to continue...")
@@ -25,10 +25,10 @@ def postgres_row_select_fn(type:str):
             query = input("    SELECT ")
             if not query.startswith("SELECT") or not query.startswith("select"):
                 query = "SELECT " + query
-            result = postgres.run_query(query,"Executing custom select on PostgreSQL...", True)
+            result = postgres.run_query(query,"Executing custom select", True)
             print("\nResult:\n")
             print("  "+'\n  '.join(map(str, result)))
             print("\n\nPress enter to continue...")
             input()
     except:
-        SingleLogger().logger.exception("Error while selecting rows to PostgreSQL", exc_info=True)
+        SingleLogger().logger.exception("PostgreSQL: Error while selecting rows", exc_info=True)

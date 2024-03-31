@@ -13,10 +13,10 @@ def postgres_row_batch_insert_fn():
         default_insert_set = int(Config().default_memory["default_insert_set"])
         default_number_files = int(Config().default_memory["default_insert_files"])
 
-        actual_doctor_rows = postgres.run_query("SELECT COUNT(*) FROM doctors","",expected_result=True)[0][0]
-        actual_patient_rows = postgres.run_query("SELECT COUNT(*) FROM patients","",expected_result=True)[0][0]
-        actual_medicalrecord_rows = postgres.run_query("SELECT COUNT(*) FROM medical_records","",expected_result=True)[0][0]
-        actual_doctormedicalrecord_rows = postgres.run_query("SELECT COUNT(*) FROM doctor_medical_records","",expected_result=True)[0][0]
+        actual_doctor_rows = postgres.run_query("SELECT COUNT(*) FROM doctors","Calculating the number of rows in the doctors' table",expected_result=True)[0][0]
+        actual_patient_rows = postgres.run_query("SELECT COUNT(*) FROM patients","Calculating the number of rows in the patients' table",expected_result=True)[0][0]
+        actual_medicalrecord_rows = postgres.run_query("SELECT COUNT(*) FROM medical_records","Calculating the number of rows in the medical_records' table",expected_result=True)[0][0]
+        actual_doctormedicalrecord_rows = postgres.run_query("SELECT COUNT(*) FROM doctor_medical_records","Calculating the number of rows in the doctor_medical_records' table",expected_result=True)[0][0]
         if actual_doctor_rows == 0 and actual_patient_rows == 0 and actual_medicalrecord_rows == 0 and actual_doctormedicalrecord_rows == 0:
             Config().default_postgres_lines_read = 0
             Config().default_postgres_last_file_read = 1
@@ -98,5 +98,5 @@ def postgres_row_batch_insert_fn():
             print("\nPlease, clean the default tables")
             input("\nPress enter to go back to the menu")
     except:
-        SingleLogger().logger.exception("Error while executing batch rows inserts in PostgreSQL", exc_info=True)
+        SingleLogger().logger.exception("PostgreSQL: Error while executing batch rows inserts", exc_info=True)
 

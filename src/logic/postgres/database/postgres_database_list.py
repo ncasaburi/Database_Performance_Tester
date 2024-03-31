@@ -19,4 +19,4 @@ def postgres_database_list_fn() -> None:
             print("\nPress enter to continue...")
             input()
     except:
-        SingleLogger().logger.exception("Error while listing available PostgreSQL databases", exc_info=True)
+        SingleLogger().logger.exception("PostgreSQL: Error while listing available databases", exc_info=True)

@@ -10,16 +10,16 @@ def postgres_table_create_fn(type:str):
         postgres = PostgreSQL()
         if type == "default":
             content_sql = Zipper().unzip_content(Config().default_data["default_postgres_creates"]+"Tables.zip","sql")
-            postgres.run_query(content_sql, "Creating default tables...")
+            postgres.run_query(content_sql, "Creating default tables")
         else:
             print("Enter the table creation query: \nExample: CREATE TABLE tablename ( columnname1 SERIAL PRIMARY KEY, columenname2 VARCHAR(50), columnname3 VARCHAR(50) )\n");
             query = input()
             query = query.lower()
             if query.startswith("create table"):
-                postgres.run_query(query, "Creating a new custom table...")
+                postgres.run_query(query, "Creating a new custom table")
             else:
                 print("\nThe query must begin with CREATE TABLE")
                 print("\nPress enter to go back to the menu")
                 input()
     except:
-        SingleLogger().logger.exception("Error while creating a MongoDB table", exc_info=True)
+        SingleLogger().logger.exception("PostgreSQL: Error while creating a table", exc_info=True)

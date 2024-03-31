@@ -18,4 +18,4 @@ def postgres_database_drop_fn(type:str):
             db_name = input()
             postgres.drop(postgre_connection_string,db_name)
     except:
-        SingleLogger().logger.exception("Error while dropping a PostgreSQL database", exc_info=True)
+        SingleLogger().logger.exception("PostgreSQL: Error while dropping a database", exc_info=True)

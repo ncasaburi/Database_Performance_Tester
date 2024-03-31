@@ -23,4 +23,4 @@ def postgres_index_create_fn(type:str):
                 print("\nPress enter to go back to the menu")
                 input()
     except:
-        SingleLogger().logger.exception("Error while creating a MongoDB index", exc_info=True)
+        SingleLogger().logger.exception("PostgreSQL: Error while creating an index", exc_info=True)

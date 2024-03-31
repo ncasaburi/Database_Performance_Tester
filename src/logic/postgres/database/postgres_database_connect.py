@@ -16,4 +16,4 @@ def postgres_database_connect_fn(type:str):
             db_name = input()
             postgres.connect(postgre_connection_string,db_name)
     except:
-        SingleLogger().logger.exception("Error while creating a PostgreSQL database", exc_info=True)
+        SingleLogger().logger.exception("PostgreSQL: Error while creating a database", exc_info=True)
