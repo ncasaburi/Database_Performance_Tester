@@ -129,7 +129,7 @@ class PostgreSQL():
             SingleLogger().logger.info("The sql query has been executed")
             if expected_result == True and self.cursor.rowcount > 0:
                 result = self.cursor.fetchall()
-            pattern = r"FROM\s+(\w+)"
+            pattern = r'(?:FROM|INTO|UPDATE|DELETE\s+FROM|CREATE\s+TABLE)\s+(\w+)'
             tablename = re.search(pattern, query, re.IGNORECASE)
             if tablename and not (tablename.group(1) == "information_schema"):
                 SingleLogger().logger.info(f"Done! Elapsed time: {(stop_counter - start_counter)} seconds, Table: {tablename.group(1)} space occupied: {self.table_space_occupied(tablename.group(1))} MB")
