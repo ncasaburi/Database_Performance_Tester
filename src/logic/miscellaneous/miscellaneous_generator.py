@@ -67,4 +67,4 @@ def miscellaneous_generator_fn(SQL_enable, MQL_enable, resume:bool=False, previo
         print("\nPress enter to continue...")
         input()
     except:
-        SingleLogger().logger.exception("Error while generating data with DataGenerator", exc_info=True)
+        SingleLogger().logger.exception("DataGenerator: Error while generating data", exc_info=True)

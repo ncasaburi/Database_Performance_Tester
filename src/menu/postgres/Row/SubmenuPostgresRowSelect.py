@@ -12,8 +12,8 @@ class SubmenuPostgresRowSelect():
         self.submenu_postgres_row_select = ConsoleMenu("PostgreSQL Row Select", status)
         
         #submenu items
-        postgres_row_select_default = FunctionItem("Insert default rows", postgres_row_select_fn, args=["default"]) 
-        postgres_row_select_custom = FunctionItem("Insert custom rows", postgres_row_select_fn, args=["custom"])
+        postgres_row_select_default = FunctionItem("Default select", postgres_row_select_fn, args=["default"]) 
+        postgres_row_select_custom = FunctionItem("Custom select", postgres_row_select_fn, args=["custom"])
 
         #submenu appends
         self.submenu_postgres_row_select.append_item(postgres_row_select_default)

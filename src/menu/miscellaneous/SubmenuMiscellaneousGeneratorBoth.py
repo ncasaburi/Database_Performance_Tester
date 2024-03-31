@@ -20,21 +20,18 @@ class SubmenuMiscellaneousGeneratorBoth():
     
     def miscellaneous_generator_both_update_fn(self) -> None:
 
-        try:
-            datasets = previous_datasets()
+        datasets = previous_datasets()
 
-            while not len(self.submenu_miscellaneous_generator_both.items) == 0:
-                for item in self.submenu_miscellaneous_generator_both.items:
-                    self.submenu_miscellaneous_generator_both.remove_item(item)
+        while not len(self.submenu_miscellaneous_generator_both.items) == 0:
+            for item in self.submenu_miscellaneous_generator_both.items:
+                self.submenu_miscellaneous_generator_both.remove_item(item)
 
-            if bool(datasets):
-                for key, value in datasets.items():
-                    self.submenu_miscellaneous_generator_both.append_item( FunctionItem("Continue dataset of "+str(len(value))+" files and "+str(key)+" items each", self.miscellaneous_generator_both_update_auxiliar_fn, args=[key,value]) )
-            self.submenu_miscellaneous_generator_both.append_item(FunctionItem("Generate a new dataset", self.miscellaneous_generator_both_update_auxiliar_fn, args=[0,0]))
+        if bool(datasets):
+            for key, value in datasets.items():
+                self.submenu_miscellaneous_generator_both.append_item( FunctionItem("Continue dataset of "+str(len(value))+" files and "+str(key)+" items each", self.miscellaneous_generator_both_update_auxiliar_fn, args=[key,value]) )
+        self.submenu_miscellaneous_generator_both.append_item(FunctionItem("Generate a new dataset", self.miscellaneous_generator_both_update_auxiliar_fn, args=[0,0]))
 
-            self.submenu_miscellaneous_generator_both.draw()
-        except:
-            SingleLogger().logger.exception("Error while executing batch document inserts in MongoDB", exc_info=True)
+        self.submenu_miscellaneous_generator_both.draw()
 
     def miscellaneous_generator_both_update_auxiliar_fn(self, key, value):
 

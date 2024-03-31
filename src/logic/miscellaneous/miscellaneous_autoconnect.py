@@ -7,7 +7,7 @@ def autoconnect_read() -> bool:
     try:
         return (lambda: True if Config().default_dbs["default_database_autoconnect"] == "True" else False)()
     except:
-        SingleLogger().logger.exception("Error while reading the autoconnect option", exc_info=True)
+        SingleLogger().logger.exception("Autoconnect: Error while reading the autoconnect option", exc_info=True)
 
 def autoconnect_set(value:bool):
     """This function sets the autoconnect option"""
@@ -15,7 +15,7 @@ def autoconnect_set(value:bool):
     try:
         Config().option_create_modify("Databases","default_database_autoconnect",str(value))
     except:
-        SingleLogger().logger.exception("Error setting the autoconnect option", exc_info=True)
+        SingleLogger().logger.exception("Autoconnect: Error setting the autoconnect option", exc_info=True)
 
 def autoconnect_switch():
     """This function swithches the autoconnect option"""
@@ -23,4 +23,4 @@ def autoconnect_switch():
     try:
         autoconnect_set(not autoconnect_read())
     except:
-        SingleLogger().logger.exception("Error switching the autoconnect option", exc_info=True)
+        SingleLogger().logger.exception("Autoconnect: Error switching the autoconnect option", exc_info=True)
