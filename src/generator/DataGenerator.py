@@ -34,7 +34,7 @@ class DataGenerator():
             self._mongo_medicalrecords_path = f"{Config().default_data['default_mongo_inserts']}MedicalRecords/"
             self._mongo_doctor_medicalrecords_path = f"{Config().default_data['default_mongo_inserts']}Doctor_MedicalRecords/"
         except:
-            SingleLogger().logger.exception("Error while initializing DataGenerator", exc_info=True)
+            SingleLogger().logger.exception("DataGenerator: Error while initializing", exc_info=True)
 
     def _create_patient(self, id:int) -> dict:
         """This function creates a patient with all their data"""
@@ -82,7 +82,7 @@ class DataGenerator():
 
         try:
             sets = lambda: "sets" if self.default_insert_files > 1 else "set"
-            SingleLogger().logger.info(f"Generating data with {int(self.default_insert_set*self.default_insert_files)} patients and splitting them into {self.default_insert_files}...")
+            SingleLogger().logger.info(f"DataGenerator: Generating a dataset of {int(self.default_insert_set*self.default_insert_files)} patients and dividing it into {self.default_insert_files} files...")
             start_counter = time.time()
             for i1 in tqdm(range(self._last_set_number, self._last_set_number + self.default_insert_files), desc="Generating "+str(self.default_insert_files)+" "+sets()+" of "+str(self.default_insert_set)+" patients", ascii=' #'):
 
@@ -103,22 +103,21 @@ class DataGenerator():
                 Zipper().zip_content(f"{self._mongo_patients_path}{self.default_insert_set}_patients_set{i1}", "db.patients.insertMany(["+',\n'.join(map(str, patients_mql))+"\n])","js")
             
             stop_counter = time.time()
-            SingleLogger().logger.info(f"Done! Elapsed time: {stop_counter - start_counter} seconds")
-            SingleLogger().logger.info("The data has been generated")
+            SingleLogger().logger.info(f"DataGenerator: Done! Elapsed time: {round(stop_counter - start_counter,3)} seconds")
             del start_counter
             del stop_counter
             del patients
             del patients_sql
             del patients_mql
         except:
-            SingleLogger().logger.exception("Error while generating patients with DataGenerator", exc_info=True)
+            SingleLogger().logger.exception("DataGenerator: Error while generating patients", exc_info=True)
 
     def generate_doctors(self) -> None:
         """This function generates doctors"""
 
         try:
             sets = lambda: "sets" if self.default_insert_files > 1 else "set"
-            SingleLogger().logger.info(f"Generating data with {int(self.default_insert_set*self.default_insert_files)} doctors and splitting them into {self.default_insert_files}...")
+            SingleLogger().logger.info(f"DataGenerator: Generating a dataset of {int(self.default_insert_set*self.default_insert_files)} doctors and dividing it into {self.default_insert_files} files...")
             start_counter = time.time()                                                                 
             for i1 in tqdm(range(self._last_set_number, self._last_set_number + self.default_insert_files), desc="Generating "+str(self.default_insert_files)+" "+sets()+" of "+str(self.default_insert_set)+" doctors", ascii=' #'):
         
@@ -139,22 +138,21 @@ class DataGenerator():
                 Zipper().zip_content(f"{self._mongo_doctors_path}{self.default_insert_set}_doctors_set{i1}", "db.doctors.insertMany(["+',\n'.join(map(str, doctors_mql))+"\n])","js")
             
             stop_counter = time.time()
-            SingleLogger().logger.info(f"Done! Elapsed time: {stop_counter - start_counter} seconds")
-            SingleLogger().logger.info("The data has been generated")
+            SingleLogger().logger.info(f"DataGenerator: Done! Elapsed time: {round(stop_counter - start_counter,3)} seconds")
             del start_counter
             del stop_counter
             del doctors
             del doctors_sql
             del doctors_mql
         except:
-            SingleLogger().logger.exception("Error while generating doctors with DataGenerator", exc_info=True)
+            SingleLogger().logger.exception("DataGenerator: Error while generating doctors", exc_info=True)
 
     def generate_medicalrecords(self) -> None:
         """This function generates medical records"""
 
         try:
             sets = lambda: "sets" if self.default_insert_files > 1 else "set"
-            SingleLogger().logger.info(f"Generating data with {int(self.default_insert_set*self.default_insert_files)} doctors and splitting them into {self.default_insert_files}...")
+            SingleLogger().logger.info(f"DataGenerator: Generating a dataset of {int(self.default_insert_set*self.default_insert_files)} medical records and dividing it into {self.default_insert_files} files...")
             start_counter = time.time()                                                                 
             for i1 in tqdm(range(self._last_set_number, self._last_set_number + self.default_insert_files), desc="Generating "+str(self.default_insert_files)+" "+sets()+" of "+str(self.default_insert_set)+" doctor medical records", ascii=' #'):
 
@@ -183,8 +181,7 @@ class DataGenerator():
                 Zipper().zip_content(f"{self._mongo_doctor_medicalrecords_path}{self.default_insert_set}_doctor_medicalrecords_set{i1}", "db.doctor_medical_records.insertMany(["+',\n'.join(map(str, doctor_medicalrecords_mql))+"\n])","js")
             
             stop_counter = time.time()
-            SingleLogger().logger.info(f"Done! Elapsed time: {stop_counter - start_counter} seconds")
-            SingleLogger().logger.info("The data has been generated")
+            SingleLogger().logger.info(f"DataGenerator: Done! Elapsed time: {round(stop_counter - start_counter,3)} seconds")
             del start_counter
             del stop_counter
             del record
@@ -195,7 +192,7 @@ class DataGenerator():
             del doctor_medicalrecords_sql
             del doctor_medicalrecords_mql
         except:
-            SingleLogger().logger.exception("Error while generating medical records with DataGenerator", exc_info=True)
+            SingleLogger().logger.exception("DataGenerator: Error while generating medical records", exc_info=True)
     
     def update_config(self, number_of_files:int=0):
         """This function updates the config values with the new numbers of items per sets and number of files"""
@@ -207,7 +204,7 @@ class DataGenerator():
             else:
                 Config().option_create_modify("Memory","default_insert_files",str(number_of_files))
         except:
-            SingleLogger().logger.exception("Error while updating config file on DataGenerator", exc_info=True)
+            SingleLogger().logger.exception("DataGenerator: Error while updating config file", exc_info=True)
 
     def check_previous_sets(self):
         """List all files in a directory that match a given pattern"""
@@ -236,7 +233,7 @@ class DataGenerator():
 
             return sets
         except:
-            SingleLogger().logger.exception("Error while checking previous sets on DataGenerator", exc_info=True)
+            SingleLogger().logger.exception("DataGenerator: Error while checking previous sets", exc_info=True)
     
     def get_common_filenames(self, path, entity, previous_dict):
         """This function return a dictionary with the datasets available"""
@@ -260,7 +257,7 @@ class DataGenerator():
 
             return temp_dict
         except:
-            SingleLogger().logger.exception("Error while getting common filenames on DataGenerator", exc_info=True)
+            SingleLogger().logger.exception("DataGenerator: Error while getting common filenames", exc_info=True)
 
     @property
     def SQL_enable(self) -> bool:

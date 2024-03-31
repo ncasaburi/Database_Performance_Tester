@@ -40,5 +40,5 @@ def database_check(db, default_database_autoconnect:bool, default_connection_str
 
         return current_stauts, autoconnect
     except Exception:
-            SingleLogger().logger.exception("Error while checking databases status", exc_info=True)
+            SingleLogger().logger.exception("Status: Error while checking databases status", exc_info=True)
             sys.exit(1)            

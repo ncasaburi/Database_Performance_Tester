@@ -20,7 +20,7 @@ class Zipper():
                 basename = os.path.basename(zippath)
                 zipf.writestr(basename+"."+filetype, io.BytesIO(content.encode()).getvalue(), compresslevel=9)        
         except Exception as error:
-            print("There is an error zipping sql content. Error: "+error)
+            print("Zipper: There is an error zipping sql content. Error: "+error)
 
     def unzip_content(self, zippath:str, filetype:str):
         """This function unzips a file and return its content"""
@@ -36,7 +36,7 @@ class Zipper():
                     content = file.read()
             return content.decode('utf-8')
         except Exception:
-            SingleLogger().logger.exception("Error while unzipping file "+zippath, exc_info=True)
+            SingleLogger().logger.exception("Zipper: Error while unzipping file "+zippath, exc_info=True)
             sys.exit(1)
     
     def _create_folder(self, path:str):
@@ -47,5 +47,5 @@ class Zipper():
                 os.makedirs(path)
                 SingleLogger().logger.info(f"Created folder: {path}")
         except Exception as error:
-            SingleLogger().logger.exception("An error occured during the creation of path "+path, exc_info=True)
+            SingleLogger().logger.exception("Zipper: An error occured during the creation of path "+path, exc_info=True)
             sys.exit(1)
