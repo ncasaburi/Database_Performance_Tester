@@ -6,9 +6,10 @@ def mongo_document_update_fn(type:str):
     """This function allows the user to update rows into a PostgreSQL database"""       
     
     try:
+        mongo = MongoDB()
         if type == "default":
             collection_default = 'patients'
-            collection = MongoDB().db[collection_default]
+            collection = mongo.db[collection_default]
             documents_left = collection.count_documents({})
             print("How many documents do you want to update?: ("+str(documents_left)+" documents available)")
             documents_to_update = input()
@@ -23,13 +24,13 @@ def mongo_document_update_fn(type:str):
             id_maximo = int(documents_to_update)
             query_update = {"id_patient": {"$gte": id_minimo, "$lte": id_maximo}}
             update = {"$set": {"name": "Roberts"}}
-            MongoDB().execute_query_update('patients',query_update,update)
+            mongo.execute_query_update('patients',query_update,update, "Updating collection patients")
             query_update = {"id_doctor": {"$gte": id_minimo, "$lte": id_maximo}}
             update = {"$set": {"name": "Mark"}}
-            MongoDB().execute_query_update('doctors',query_update,update)
+            mongo.execute_query_update('doctors',query_update,update, "Updating collection doctors")
             query_update = {"id_medical_record": {"$gte": id_minimo, "$lte": id_maximo}}
             update = {"$set": {"discharge_date": datetime.now().strftime('%Y-%m-%d')}}
-            MongoDB().execute_query_update('medical_records',query_update,update)
+            mongo.execute_query_update('medical_records',query_update,update, "Updating collection medical_records")
         else:
             print("Enter your query to update documents: (if a field doesn't apply, press enter)\n")
             print("  Example:")
@@ -47,4 +48,4 @@ def mongo_document_update_fn(type:str):
                 print("Some of the inputs are empty...")
                 input("")
     except:
-        SingleLogger().logger.exception("Error while updating rows on PostgreSQL", exc_info=True)
+        SingleLogger().logger.exception("MongoDB: Error while updating documents", exc_info=True)

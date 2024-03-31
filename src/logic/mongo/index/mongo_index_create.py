@@ -23,6 +23,6 @@ def mongo_index_create_fn(type:str):
             parameters = match[1]
             parameters = ast.literal_eval(parameters)
             print("Executing -> db.", collection_name,".createIndex.",parameters)
-            MongoDB().create_index(collection_name,parameters)
+            MongoDB().create_index(collection_name,parameters, f"Creating index on collection: {collection_name}")
     except:
-        SingleLogger().logger.exception("Error while creating a MongoDB index", exc_info=True)
+        SingleLogger().logger.exception("MongoDB: Error while creating an index", exc_info=True)

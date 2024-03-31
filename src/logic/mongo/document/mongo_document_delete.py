@@ -21,13 +21,13 @@ def mongo_document_delete_fn(type:str) -> None:
             id_minimo = int(1)
             id_maximo = int(documents_to_delete)
             query_delete = {"id_doctor": {"$gte": id_minimo, "$lte": id_maximo}}
-            MongoDB().execute_query_delete('doctor_medical_records',query_delete)
+            MongoDB().execute_query_delete('doctor_medical_records',query_delete, "Deleting documents in collection doctor_medical_records")
             query_delete = {"id_doctor": {"$gte": id_minimo, "$lte": id_maximo}}
-            MongoDB().execute_query_delete('doctors',query_delete)
+            MongoDB().execute_query_delete('doctors',query_delete, "Deleting documents in collection doctors")
             query_delete = {"id_patient": {"$gte": id_minimo, "$lte": id_maximo}}
-            MongoDB().execute_query_delete('patients',query_delete)
+            MongoDB().execute_query_delete('patients',query_delete, "Deleting documents in collection patients")
             query_delete = {"id_medical_record": {"$gte": id_minimo, "$lte": id_maximo}}
-            MongoDB().execute_query_delete('medical_records',query_delete)
+            MongoDB().execute_query_delete('medical_records',query_delete, "Deleting documents in collection medical_records")
         else:
             print("Enter your query to delete documents: (if a field doesn't apply, press enter)\n")
             print("  Example:")
@@ -43,4 +43,4 @@ def mongo_document_delete_fn(type:str) -> None:
                 print("Some of the inputs are empty...")
                 input("")
     except:
-        SingleLogger().logger.exception("Error while deleting documents to MongoDB", exc_info=True)
+        SingleLogger().logger.exception("MongoDB: Error while deleting documents", exc_info=True)

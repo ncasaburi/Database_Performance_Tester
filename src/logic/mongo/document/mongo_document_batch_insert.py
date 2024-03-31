@@ -99,5 +99,5 @@ def mongo_document_batch_insert_fn():
             print("\nPlease, clean the default collections")
             input("\nPress enter to go back to the menu")
     except:
-        SingleLogger().logger.exception("Error while executing batch document inserts in MongoDB", exc_info=True)
+        SingleLogger().logger.exception("MongoDB: Error while executing batch document inserts", exc_info=True)
 

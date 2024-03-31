@@ -18,4 +18,4 @@ def mongo_database_create_fn(type:str):
             db_name = input()
             mongo.create(mongo_connection_string,db_name)
     except:
-        SingleLogger().logger.exception("Error while creating a MongoDB database", exc_info=True)
+        SingleLogger().logger.exception("MongoDB: Error while creating a database", exc_info=True)

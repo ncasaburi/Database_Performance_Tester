@@ -69,10 +69,10 @@ def mongo_document_insert_fn(type:str, requested_documents:int=0, current_iterat
             query = query.lower()
             query = query.replace("'", '"')
             print("    ])")
-            mongo.execute_query_insert(re.split(r'\.', collection_name)[0],'['+query+']')
+            mongo.execute_query_insert(re.split(r'\.', collection_name)[0],'['+query+']', "Inserting documents into collection: "+re.split(r'\.', collection_name)[0])
                 
     except:
-        SingleLogger().logger.exception("Error while inserting documents to MongoDB", exc_info=True)
+        SingleLogger().logger.exception("MongoDB: Error while inserting documents", exc_info=True)
 
 def load_mql_content(element:str, requested_documents:int, default_document_set:int, default_mongo_lines_read, default_mongo_last_file_read, mongo) -> list:
 
@@ -129,6 +129,6 @@ def load_mql_content(element:str, requested_documents:int, default_document_set:
 
     #Inserting documents
     print("  inserting documents...")
-    mongo.execute_query_insert(collection_name,content_mongo)
+    mongo.execute_query_insert(collection_name,content_mongo,f"Inserting documents into collection: {collection_name}")
     return (requested_documents,default_document_set,default_mongo_lines_read,default_mongo_last_file_read)
 

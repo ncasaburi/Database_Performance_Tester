@@ -25,4 +25,4 @@ def mongo_collection_list_fn(enable_interaction:bool=True):
                 return
         return
     except:
-        SingleLogger().logger.exception("Error while listing MongoDB collections", exc_info=True)
+        SingleLogger().logger.exception("MongoDB: Error while listing collections", exc_info=True)

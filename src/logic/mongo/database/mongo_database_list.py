@@ -15,4 +15,4 @@ def mongo_database_list_fn() -> None:
         print("\nPress enter to continue...")
         input()
     except:
-        SingleLogger().logger.exception("Error while listing MongoDB databases", exc_info=True)
+        SingleLogger().logger.exception("MongoDB: Error while listing databases", exc_info=True)

@@ -19,4 +19,4 @@ def mongo_collection_drop_fn(type:str):
             collectionname = input()            
             MongoDB().drop_collection(collectionname)
     except:
-        SingleLogger().logger.exception("Error while dropping MongoDB collections", exc_info=True)
+        SingleLogger().logger.exception("MongoDB: Error while dropping collections", exc_info=True)

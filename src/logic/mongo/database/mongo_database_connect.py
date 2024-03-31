@@ -18,4 +18,4 @@ def mongo_database_connect_fn(type:str):
             db_name = input()
             mongo.connect(mongo_connection_string,db_name)
     except:
-        SingleLogger().logger.exception("Error while connecting to a MongoDB database", exc_info=True)
+        SingleLogger().logger.exception("MongoDB: Error while connecting to a database", exc_info=True)

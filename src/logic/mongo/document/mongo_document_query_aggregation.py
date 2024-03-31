@@ -18,7 +18,7 @@ def mongo_document_query_aggregation_fn(type:str):
             query = '[ {"$match": {"name": "Michael"}}, {"$limit": 5} ]'
             print("  collection = "+collection_name)
             print("  pipeline = "+query)
-            result = mongo.execute_aggregate(collection_name, ast.literal_eval(query))
+            result = mongo.execute_aggregate(collection_name, ast.literal_eval(query), f"Executing aggregation on collection: {collection_name}")
             print("\nResult:\n")
             print("  "+'\n  '.join(map(str, result)))
             print("\n\nPress enter to continue...")
@@ -43,10 +43,10 @@ def mongo_document_query_aggregation_fn(type:str):
                 stages = "[{" + stages
             if not stages.endswith("]"):
                 stages = stages + "]"
-            result = mongo.execute_aggregate(collection_name, ast.literal_eval(stages))
+            result = mongo.execute_aggregate(collection_name, ast.literal_eval(stages), f"Executing aggregation on collection: {collection_name}")
             print("\nResult:\n")
             print("  "+'\n  '.join(map(str, result)))
             print("\n\nPress enter to continue...")
             input()
     except:
-        SingleLogger().logger.exception("Error while quering the MongoDB with find", exc_info=True)
+        SingleLogger().logger.exception("MongoDB: Error while executing aggregation", exc_info=True)
