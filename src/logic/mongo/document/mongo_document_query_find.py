@@ -16,7 +16,7 @@ def mongo_document_query_find_fn(type:str):
             print("The following query is going to be executed:\n")
             query = "doctors.find({'id_doctor': {'$gte': 1, '$lte': 5}})"
             print("  "+query)
-            result = mongo.execute_query_find("doctors", {'id_doctor': {'$gte': 1, '$lte': 5}}, "Executing find in collection: doctors")
+            result = mongo.execute_query_find("doctors", {'id_doctor': {'$gte': 1, '$lte': 5}}, "Executing default find query1 in collection: doctors")
             print("\nResult:\n")
             print("  "+'\n  '.join(map(str, result)))
             print("\n\nPress enter to continue...")
@@ -34,7 +34,7 @@ def mongo_document_query_find_fn(type:str):
                 query = "{" + query
             if not query.endswith("}"):
                 query = query + "}"
-            result = mongo.execute_query_find(collection_name, ast.literal_eval(query), f"Executing find in collection: {collection_name}")
+            result = mongo.execute_query_find(collection_name, ast.literal_eval(query), f"Executing custom find in collection: {collection_name}")
             print("\nResult:\n")
             print("  "+'\n  '.join(map(str, result)))
             print("\n\nPress enter to continue...")
