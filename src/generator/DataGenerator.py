@@ -5,7 +5,6 @@ from src.config.Config import Config
 from src.generator.CustomFaker import CustomFaker
 from tqdm import tqdm
 import time
-import fnmatch
 import os
 import re
 

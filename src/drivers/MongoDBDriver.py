@@ -111,16 +111,23 @@ class MongoDB():
             SingleLogger().logger.exception("MongoDB: Error while updating documents", exc_info=True)
             return None
         
-    def execute_query_delete(self, collection_name, query_delete, description:str=""):
+    def execute_query_delete(self, collection_name, filter:dict={}, description:str="", limit_number:int=0):
         """This function deletes documents from a MongoDB collection"""
 
         try:
             if not description == "":
                 SingleLogger().logger.info(f"MongoDB: {description}")
             collection = self.db[collection_name]
-            start_counter = time.time()
-            result = collection.delete_many(query_delete)
-            stop_counter = time.time()
+            if not (limit_number == 0):
+                documents_to_delete = self.execute_query_find(collection_name,limit_number=limit_number)
+                ids_to_delete = [doc['_id'] for doc in documents_to_delete]
+                start_counter = time.time()
+                result = collection.delete_many({'_id': {'$in': ids_to_delete}})
+                stop_counter = time.time()
+            else:   
+                start_counter = time.time()
+                result = collection.delete_many(filter)
+                stop_counter = time.time()
             resident_memory , virtual_memory = self.get_memory_status()
             SingleLogger().logger.info("MongoDB: Total documents deleted: " + str(result.deleted_count))
             SingleLogger().logger.info(f"MongoDB: Done! Elapsed time: {round(stop_counter - start_counter, 3)} seconds, Collection: {collection_name} Space occupied: {self.collection_space_occupied(collection_name)} MB, Resident memory: {resident_memory} MB, Virtual memory: {virtual_memory} MB")
@@ -129,7 +136,7 @@ class MongoDB():
             SingleLogger().logger.exception("MongoDB: Error while deleting documents", exc_info=True)
             return None
 
-    def execute_query_find(self, collection_name, query:dict, description:str=""):
+    def execute_query_find(self, collection_name, query:dict={}, description:str="", limit_number:int=0):
         """This function executy a query to find documents"""
 
         try:
@@ -137,7 +144,10 @@ class MongoDB():
                 SingleLogger().logger.info(f"MongoDB: {description}")
             collection = self.db[collection_name]
             start_counter = time.time()
-            result = collection.find(query)
+            if limit_number == 0:
+                result = collection.find(query)
+            else:
+                result = collection.find(query).limit(limit_number)
             stop_counter = time.time()
             resident_memory , virtual_memory = self.get_memory_status()
             SingleLogger().logger.info("MongoDB: Number of documents found " + str(self.count_documents(collection_name)))
