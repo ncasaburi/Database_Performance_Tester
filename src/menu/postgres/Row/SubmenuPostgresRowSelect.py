@@ -12,11 +12,15 @@ class SubmenuPostgresRowSelect():
         self.submenu_postgres_row_select = ConsoleMenu("PostgreSQL Row Select", status)
         
         #submenu items
-        postgres_row_select_default = FunctionItem("Default select", postgres_row_select_fn, args=["default"]) 
+        postgres_row_select_default1 = FunctionItem("Default select (query 1)", postgres_row_select_fn, args=["default1"])
+        postgres_row_select_default2 = FunctionItem("Default select (query 2)", postgres_row_select_fn, args=["default2"])
+        postgres_row_select_default3 = FunctionItem("Default select (query 3)", postgres_row_select_fn, args=["default3"])  
         postgres_row_select_custom = FunctionItem("Custom select", postgres_row_select_fn, args=["custom"])
 
         #submenu appends
-        self.submenu_postgres_row_select.append_item(postgres_row_select_default)
+        self.submenu_postgres_row_select.append_item(postgres_row_select_default1)
+        self.submenu_postgres_row_select.append_item(postgres_row_select_default2)
+        self.submenu_postgres_row_select.append_item(postgres_row_select_default3)
         self.submenu_postgres_row_select.append_item(postgres_row_select_custom)
     
     def get(self) -> ConsoleMenu:
