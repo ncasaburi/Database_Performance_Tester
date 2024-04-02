@@ -19,7 +19,7 @@ This tool was developed with the purpose of testing the performance of Postgres 
 > This software requires Python version 3.10 or newer.
 1. Clone the repository
 ```
-git clone https://github.com/ncasaburi/Databases_Performance_Test.git
+git clone https://github.com/ncasaburi/Database_Performance_Tester.git
 ```
 2. Move into the repository
 ```
