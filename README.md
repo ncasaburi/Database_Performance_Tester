@@ -37,3 +37,7 @@ python3 -m venv .venv; . .venv/bin/activate; pip install -r requirements.txt
 ```
 python3 __main__.py
 ```
+## Generate datasets
+Database Performance Tester comes with a dataset of 500000 registers (250000 rows for PostgreSQL and 250000 documents for MongoDB). However, the tool also includes a feature called DataGenerator under the Miscellaneous option menu, which can generate millons and millons of data to populate the default hospital database.
+
+![DataGenerator](/images/DataGenerator.png "DataGenerator")
