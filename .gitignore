@@ -1,9 +1,6 @@
 # Entornos virtuales
 .venv
-.config.ini
 __pycache__/
 /data/PostgreSQL/__pycache__/
 /data/Mongo/__pycache__/
 logs/
-data/MongoDB/Inserts
-data/PostgreSQL/Inserts

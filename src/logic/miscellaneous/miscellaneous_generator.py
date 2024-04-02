@@ -51,7 +51,8 @@ def miscellaneous_generator_fn(SQL_enable, MQL_enable, resume:bool=False, previo
                 continue
 
             print("")
-            print(f"As a result, {total_rows} rows are going to be generated and split into {int(file_numbers)} files")
+            print(f"As a result:")
+            print("    "+str(int(file_numbers))+" files of "+str(int(total_rows/file_numbers))+" rows/documents each are going to be generated (total "+str(int(total_rows))+" rows/documents)")
             confirmation = input("\nAre you sure? [yes,no,exit]: ").lower()
             if confirmation == "exit":
                 return
