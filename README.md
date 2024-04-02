@@ -14,6 +14,8 @@ This tool was developed with the purpose of testing the performance of Postgres 
 
 ![Main Menu](/images/Main_menu.png "Main Menu")
 
+More images can be seen under the images folder
+
 ## Steps to run the tool:
 > [!NOTE]
 > This software requires Python version 3.10 or newer.
