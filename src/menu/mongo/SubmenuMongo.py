@@ -19,14 +19,12 @@ class SubmenuMongo():
         mongo_collections = SubmenuItem("Collections", SubmenuMongoCollection().get(), menu=self.submenu_mongo)
         mongo_documents = SubmenuItem("Documents", SubmenuMongoDocument().get(), menu=self.submenu_mongo)
         mongo_indexes = SubmenuItem("Indexes", SubmenuMongoIndex().get(), menu=self.submenu_mongo)
-        mongo_files = SubmenuItem("Files", self.submenu_mongo, menu=self.submenu_mongo)
 
         #submenu appends
         self.submenu_mongo.append_item(mongo_database)
         self.submenu_mongo.append_item(mongo_collections)
         self.submenu_mongo.append_item(mongo_documents)
         self.submenu_mongo.append_item(mongo_indexes)
-        self.submenu_mongo.append_item(mongo_files)
     
     def get(self) -> ConsoleMenu:
         return self.submenu_mongo
