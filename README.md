@@ -25,7 +25,7 @@ git clone https://github.com/ncasaburi/Database_Performance_Tester.git
 ```
 2. Move into the repository
 ```
-cd Databases_Performance_Test/
+cd Database_Performance_Tester/
 ```
 3. Start Mongo and PostgreSQL containers
 ```
