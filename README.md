@@ -14,7 +14,7 @@ This tool was developed with the purpose of testing the performance of Postgres 
 
 ![Main Menu](/images/Main_menu.png "Main Menu")
 
-More images can be seen under the images folder
+More images can be seen under the [images folder](https://github.com/ncasaburi/Database_Performance_Tester/tree/main/images)
 
 ## Steps to run the tool:
 > [!NOTE]
